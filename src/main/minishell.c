@@ -15,7 +15,6 @@
 int	main(int argc, char **argv, char **envp)
 {
 	t_mini	mini;
-	char	*input;
 	char	cwd[PATH_MAX];
 
 	if (argc > 0 && argv[0])
@@ -24,16 +23,17 @@ int	main(int argc, char **argv, char **envp)
 			printf("Current dir: %s\n", cwd);
 		while (1)
 		{
-			input = readline("MiniHell> ");
-			if (ft_strlen(input) == 4)
-				if (ft_memcmp("exit", input, 4) == 0)
+			mini.input = readline("MiniHell> ");
+			if (ft_strlen(mini.input) == 4)
+				if (ft_memcmp("exit", mini.input, ft_strlen(mini.input)) == 0)
 					exit(EXIT_SUCCESS);
-			add_history(input);
+			add_history(mini.input);
 			get_env_paths(&mini, envp);
-			if (fork() != 0)
+			interpreter(&mini);
+			/* if (fork() != 0)
 				wait(NULL);
 			else
-				exec_cmd(mini, input, envp);
+				exec_cmd(mini, mini.input, envp); */
 		}
 	}
 	return (0);

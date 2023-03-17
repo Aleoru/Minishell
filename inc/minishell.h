@@ -12,7 +12,7 @@
 
 #ifndef MINISHELL_H
 # define MINISHELL_H
-# define ERROR_CMD "Command not found"
+# define ERROR_CMD "Command not found\n"
 
 # include <stdio.h>
 # include <stdlib.h>
@@ -24,13 +24,33 @@
 # include <readline/history.h>
 # include <sys/wait.h>
 
+/* to write, read, close, access, pipe, dup, dup2, execve, fork */
+# include <sys/types.h>
+# include <sys/uio.h>
+
+/* open, unlink */
+# include <fcntl.h>
+
+/* strerror */
+# include <string.h>
+
 # include "../libft/inc/libft.h"
 
-typedef struct mini
+typedef struct s_mini
 {
+	char	*input;
+	char	**cmd_pipe;
 	char	**paths;
 	char	*cmd;
 	char	**options;
+	int		fd[10][2];
+	pid_t	pid[10];
+	int		n_cmd;
+	char	*infile;
+	char	*outfile;
+	int		in_fd;
+	int		out_fd;
+	int		double_out;
 }	t_mini;
 
 /*
@@ -38,5 +58,7 @@ typedef struct mini
 */
 void	get_env_paths(t_mini *mini, char **envp);
 void	exec_cmd(t_mini mini, char *str, char **envp);
+void	interpreter(t_mini *mini);
+void 	pipex(t_mini *mini);
 
 #endif
