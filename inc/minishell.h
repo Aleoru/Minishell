@@ -58,7 +58,7 @@ typedef struct s_mini
 */
 void	get_env_paths(t_mini *mini, char **envp);
 void	exec_cmd(t_mini mini, char *str, char **envp);
-void	interpreter(t_mini *mini);
-void 	pipex(t_mini *mini);
+void	interpreter(t_mini *mini, char **envp);
+void 	pipex(t_mini *mini, char **envp);
 
 #endif

@@ -19,6 +19,7 @@ int	main(int argc, char **argv, char **envp)
 
 	if (argc > 0 && argv[0])
 	{
+		ft_bzero(&mini, sizeof(t_mini));
 		if (getcwd(cwd, sizeof(cwd)) != NULL)
 			printf("Current dir: %s\n", cwd);
 		while (1)
@@ -29,7 +30,7 @@ int	main(int argc, char **argv, char **envp)
 					exit(EXIT_SUCCESS);
 			add_history(mini.input);
 			get_env_paths(&mini, envp);
-			interpreter(&mini);
+			interpreter(&mini, envp);
 			/* if (fork() != 0)
 				wait(NULL);
 			else

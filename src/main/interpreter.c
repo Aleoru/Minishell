@@ -1,40 +1,78 @@
 #include "../../inc/minishell.h"
 
-void	split_cmd_line(t_mini *mini)
+char	*del_spaces(t_mini *mini)
 {
 	int		i;
-	int		y;
+	int		j;
 	char	*str;
 
 	i = 0;
-	y = 0;
-	str = malloc(ft_strlen(mini->input) * sizeof(char));
-	mini->cmd_pipe = malloc(mini->n_cmd * sizeof(char *));
-	printf("%s\n", mini->input);
+	j = 0;
+	str = ft_calloc(1, ft_strlen(mini->input) * sizeof(char));
 	while (mini->input[i])
 	{
 		while (mini->input[i] == ' ' && mini->input[i] != '\0')
 			i++;
 		while (mini->input[i] != ' ' && mini->input[i] != '\0')
 		{
-			str[y] = mini->input[i];
-			y++;
+			if (mini->input[i] == '|' && mini->input[i - 1] == ' ')
+			{
+				str[j - 1] = mini->input[i];
+				i++;
+				break ;
+			}
+			else if (mini->input[i] == '|' && mini->input[i + 1] == ' ')
+			{
+				str[j] = mini->input[i];
+				j++;
+				i++;
+				break ;				
+			}
+			str[j] = mini->input[i];
+			j++;
 			i++;
 			if (mini->input[i] == ' ')
 			{
-				str[y] = mini->input[i];
-				y++;
+				str[j] = mini->input[i];
+				j++;
 				i++;
 			}
-			printf("%s\n", str);
 		}
 	}
+	if (str[j - 1] == ' ')
+		str[j - 1] = '\0';
+	else
+		str[j] = '\0';
 	free(mini->input);
-	printf("%s\n", str);
-	free(str);
+	return (str);
+}
+ 
+void	split_cmd_line(t_mini *mini)
+{
+	int		start;
+	int		i;
+	int		j;
+	char	*str;
+
+	i = 0;
+	j = 0;
+	start = 0;
+	mini->cmd_pipe = malloc(mini->n_cmd * sizeof(char *));
+	str = del_spaces(mini);
+	while (str[i])
+	{
+		if (str[i] == '|')
+		{
+			mini->cmd_pipe[j] = ft_substr(str, start, ((i - 1) - start));
+			j++;
+			start = i + 1;
+		}
+		i++;
+	}
+	mini->cmd_pipe[j] = ft_substr(str, start, (i - start));
 }
 
-void	interpreter(t_mini *mini)
+void	interpreter(t_mini *mini, char **envp)
 {
 	int	i;
 
@@ -51,5 +89,5 @@ void	interpreter(t_mini *mini)
 	split_cmd_line(mini);
 /* 	mini->fd = ft_calloc(mini->n_cmd, 2 * sizeof(int));
 	mini->pid = malloc(mini->n_cmd * sizeof(pid_t)); */
-	//pipex(mini);
+	pipex(mini, envp);
 }
