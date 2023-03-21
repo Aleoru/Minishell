@@ -52,7 +52,7 @@ typedef struct s_mini
 	int		out_fd;
 	int		double_out;
 	char	*limit;
-	char	*heredoc;
+	int		heredoc;
 }	t_mini;
 
 /*

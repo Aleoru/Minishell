@@ -1,18 +1,6 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   interpreter.c                                      :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: aoropeza <aoropeza@student.42malaga.com>   +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2023/03/21 12:19:43 by aoropeza          #+#    #+#             */
-/*   Updated: 2023/03/21 12:19:45 by aoropeza         ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
-
 #include "../../inc/minishell.h"
 
-char	*del_spaces(t_mini *mini)
+void	del_spaces(t_mini *mini)
 {
 	int		i;
 	int		j;
@@ -27,30 +15,9 @@ char	*del_spaces(t_mini *mini)
 			i++;
 		while (mini->input[i] != ' ' && mini->input[i] != '\0')
 		{
-			if ((mini->input[i] == '|' || mini->input[i] == '<'
-					|| mini->input[i] == '>') && mini->input[i - 1] == ' ')
-			{
-				str[j - 1] = mini->input[i];
-				i++;
-				break ;
-			}
-			else if ((mini->input[i] == '|' || mini->input[i] == '<'
-					|| mini->input[i] == '>') && mini->input[i + 1] == ' ')
-			{
-				str[j] = mini->input[i];
-				j++;
-				i++;
-				break ;
-			}
-			str[j] = mini->input[i];
-			j++;
-			i++;
+			str[j++] = mini->input[i++];
 			if (mini->input[i] == ' ')
-			{
-				str[j] = mini->input[i];
-				j++;
-				i++;
-			}
+				str[j++] = mini->input[i++];
 		}
 	}
 	if (str[j - 1] == ' ')
@@ -58,6 +25,40 @@ char	*del_spaces(t_mini *mini)
 	else
 		str[j] = '\0';
 	free(mini->input);
+	mini->input = str;
+}
+
+char	*del_sep_space(t_mini *mini)
+{
+	int		i;
+	int		j;
+	char	*str;
+
+	i = 0;
+	j = 0;
+	str = ft_calloc(1, ft_strlen(mini->input) * sizeof(char));
+	printf("input:%s\n", mini->input);
+	while (mini->input[i])
+	{
+		if ((mini->input[i] == '|' || mini->input[i] == '<'
+				|| mini->input[i] == '>') && mini->input[i - 1] == ' ')
+		{
+			str[j - 1] = mini->input[i];
+			i++;
+			break ;
+		}
+		else if ((mini->input[i] == '|' || mini->input[i] == '<'
+				|| mini->input[i] == '>') && mini->input[i + 1] == ' ')
+		{
+			str[j] = mini->input[i];
+			i++;
+			j++;
+			break ;
+		}
+		str[j] = mini->input[i];
+		j++;
+		i++;
+	}
 	return (str);
 }
 
@@ -72,12 +73,12 @@ void	split_cmd_line(t_mini *mini)
 	j = 0;
 	start = 0;
 	mini->cmd_pipe = malloc(mini->n_cmd * sizeof(char *));
-	str = del_spaces(mini);
-	printf("%s\n", str);
+	del_spaces(mini);
+	str = del_sep_space(mini);
+	printf("str: %s\n", str);
 	while (str[i])
 	{
-		if ((str[i] == '|' && str[i + 1] == '|') || (str[i] == '<'
-				&& str[i + 1] == '<') || (str[i] == '>'
+		if ((str[i] == '<' && str[i + 1] == '<') || (str[i] == '>'
 				&& str[i + 1] == '>'))
 		{
 			mini->cmd_pipe[j] = ft_substr(str, start, (i - start));
@@ -111,14 +112,8 @@ void	interpreter(t_mini *mini, char **envp)
 	mini->n_cmd = 0;
 	while (mini->input[i])
 	{
-		if (mini->input[i] == '|' || mini->input[i] == '<'
-			|| mini->input[i] == '>')
-		{
-			if (mini->input[i - 1] == '<' || mini->input[i - 1] == '>')
-				i++;
-			else
+		if (mini->input[i] == '|')
 				mini->n_cmd++;
-		}
 		i++;
 	}
 	mini->n_cmd++;

@@ -163,13 +163,13 @@ void	pipex(t_mini *mini, char **envp)
 	mini->double_out = 0; // ( 1 >> ) ( 0 > )
 	//mini->outfile = ft_strdup("./file.txt");
 	//mini->infile = ft_strdup("./infile.txt");
-	mini->heredoc = 1;
+	mini->heredoc = 0;
 	mini->limit = ft_strdup("fin");
-	if (mini->heredoc)
+ 	if (mini->heredoc)
 	{
 		mini->infile = ft_strdup("./.infile.tmp");
 		heredoc(mini);
-	}
+	} 
 	mini->infile = NULL;
 	mini->outfile = NULL;
 	if (mini->infile != NULL)
