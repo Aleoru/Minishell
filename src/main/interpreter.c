@@ -5,128 +5,72 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: aoropeza <aoropeza@student.42malaga.com>   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2023/03/21 12:19:43 by aoropeza          #+#    #+#             */
-/*   Updated: 2023/03/21 12:19:45 by aoropeza         ###   ########.fr       */
+/*   Created: 2023/03/28 17:11:18 by aoropeza          #+#    #+#             */
+/*   Updated: 2023/03/28 17:11:19 by aoropeza         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../inc/minishell.h"
 
-char	*del_spaces(t_mini *mini)
-{
-	int		i;
-	int		j;
-	char	*str;
-
-	i = 0;
-	j = 0;
-	str = ft_calloc(1, ft_strlen(mini->input) * sizeof(char));
-	while (mini->input[i])
-	{
-		while (mini->input[i] == ' ' && mini->input[i] != '\0')
-			i++;
-		while (mini->input[i] != ' ' && mini->input[i] != '\0')
-		{
-			if ((mini->input[i] == '|' || mini->input[i] == '<'
-					|| mini->input[i] == '>') && mini->input[i - 1] == ' ')
-			{
-				str[j - 1] = mini->input[i];
-				i++;
-				break ;
-			}
-			else if ((mini->input[i] == '|' || mini->input[i] == '<'
-					|| mini->input[i] == '>') && mini->input[i + 1] == ' ')
-			{
-				str[j] = mini->input[i];
-				j++;
-				i++;
-				break ;
-			}
-			str[j] = mini->input[i];
-			j++;
-			i++;
-			if (mini->input[i] == ' ')
-			{
-				str[j] = mini->input[i];
-				j++;
-				i++;
-			}
-		}
-	}
-	if (str[j - 1] == ' ')
-		str[j - 1] = '\0';
-	else
-		str[j] = '\0';
-	free(mini->input);
-	return (str);
-}
-
 void	split_cmd_line(t_mini *mini)
 {
-	int		start;
 	int		i;
 	int		j;
 	char	*str;
 
-	i = 0;
+	mini->cmd_pipe = ft_calloc(mini->n_cmd + 1, sizeof(char *));
+/* 	del_spaces(mini); */
+	str = del_sep_space(mini);
+/* 	printf("str:%s\n", str);	//borrar */
+	i = has_infile(mini, str);
 	j = 0;
-	start = 0;
-	mini->cmd_pipe = malloc(mini->n_cmd * sizeof(char *));
-	str = del_spaces(mini);
-	printf("%s\n", str);
-	while (str[i])
+	while (str[i] != '\0')
 	{
-		if ((str[i] == '|' && str[i + 1] == '|') || (str[i] == '<'
-				&& str[i + 1] == '<') || (str[i] == '>'
-				&& str[i + 1] == '>'))
+		if ((str[i] == '|' && str[i + 1] != '|') || j < mini->n_cmd)
+			i = is_cmd(mini, str, i, j++);
+		if (str[i] == '$')
+			i = has_var(mini, str, i, j - 1);
+		if (str[i] == '>')
+			i = has_outfile(mini, str, i);
+		if (i == -1)
 		{
-			mini->cmd_pipe[j] = ft_substr(str, start, (i - start));
-			printf("%d: %s\n", j, mini->cmd_pipe[j]);
-			i++;
-			j++;
-			start = i + 1;
+			mini->error = -1;
+			return ;
 		}
-		else if (str[i] == '|' || str[i] == '<'
-			|| str[i] == '>')
-		{
-			mini->cmd_pipe[j] = ft_substr(str, start, (i - start));
-			printf("%d: %s\n", j, mini->cmd_pipe[j]);
-			j++;
-			start = i + 1;
-		}
-		i++;
+		if (str[i] == '\0')
+			break ;
 	}
-	if (j < mini->n_cmd)
-	{
-		mini->cmd_pipe[j] = ft_substr(str, start, (i - start));
-		printf("%d: %s\n", j, mini->cmd_pipe[j]);
-	}
+	printf("%d:%s\n", j - 1, mini->cmd_pipe[j - 1]);	//borrar
+	mini->cmd_pipe[j] = NULL;
 }
 
-void	interpreter(t_mini *mini, char **envp)
+void	interpreter(t_mini *mini)
 {
 	int	i;
 
 	i = 0;
 	mini->n_cmd = 0;
+	mini->n_out = 0;
+	mini->append = 0;
+	mini->heredoc = 0;
+	mini->infile = NULL;
+	mini->outfile = NULL;
 	while (mini->input[i])
 	{
-		if (mini->input[i] == '|' || mini->input[i] == '<'
-			|| mini->input[i] == '>')
-		{
-			if (mini->input[i - 1] == '<' || mini->input[i - 1] == '>')
-				i++;
-			else
-				mini->n_cmd++;
-		}
+		if (mini->input[i] == '|')
+			mini->n_cmd++;
+		if (mini->input[i] == '>' && mini->input[i + 1] != '>')
+			mini->n_out++;
+		if (mini->input[i] == '>' && mini->input[i + 1] == '>')
+			mini->append++;
 		i++;
 	}
 	mini->n_cmd++;
-	printf("Nº cmd: %d\n", mini->n_cmd);
+	/* printf("Nº cmd: %d\n", mini->n_cmd);	//borrar */
 	split_cmd_line(mini);
-	if (envp)
-		printf("\n");
+	if (mini->error == -1)
+		return ;
 /* 	mini->fd = ft_calloc(mini->n_cmd, 2 * sizeof(int));
 	mini->pid = malloc(mini->n_cmd * sizeof(pid_t)); */
-	//pipex(mini, envp);
+	pipex(mini);
 }

@@ -1,17 +1,17 @@
 #include "../../inc/minishell.h"
 
-void	get_env_paths(t_mini *mini, char **envp)
+void	get_env_paths(t_mini *mini)
 {
 	int		i;
 	char	*tmp;
 
 	i = 0;
-	while (envp[i])
+	while (mini->env[i])
 	{
-		tmp = ft_strnstr(envp[i], "PATH=", ft_strlen("PATH="));
+		tmp = ft_strnstr(mini->env[i], "PATH=", ft_strlen("PATH="));
 		if (tmp)
 		{
-			tmp = ft_strdup(envp[i]);
+			tmp = ft_strdup(mini->env[i]);
 			break ;
 		}
 		i++;
@@ -49,16 +49,16 @@ static char	*get_cmd_path(char *cmd, t_mini *mini)
 	return (0);
 }
 
-void	exec_cmd(t_mini mini, char *str, char **envp)
+void	exec_cmd(t_mini mini, char *str)
 {
 	char	*cmd_path;
-	
+
 	mini.options = ft_split(str, ' ');
 	mini.cmd = ft_strdup(mini.options[0]);
 	cmd_path = get_cmd_path(mini.cmd, &mini);
 	if (!cmd_path)
 		exit_error(ERROR_CMD);
-	if (execve(cmd_path, mini.options, envp))
+	if (execve(cmd_path, mini.options, mini.env))
 	{
 		write(2, "ERROR", ft_strlen("ERROR"));
 		write(2, "\n", 1);

@@ -20,17 +20,19 @@ int	main(int argc, char **argv, char **envp)
 	if (argc > 0 && argv[0])
 	{
 		ft_bzero(&mini, sizeof(t_mini));
+		mini.p_exit = 0;
 		if (getcwd(cwd, sizeof(cwd)) != NULL)
 			printf("Current dir: %s\n", cwd);
+		init_env(&mini, envp);
 		while (1)
 		{
-			mini.input = readline("MiniHell> ");
+			mini.input = readline("\033[33;1mMiniHell> \033[0m");
 			if (ft_strlen(mini.input) == 4)
 				if (ft_memcmp("exit", mini.input, ft_strlen(mini.input)) == 0)
 					exit(EXIT_SUCCESS);
 			add_history(mini.input);
-			get_env_paths(&mini, envp);
-			interpreter(&mini, envp);
+			get_env_paths(&mini);
+			interpreter(&mini);
 		}
 	}
 	return (0);

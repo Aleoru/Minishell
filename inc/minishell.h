@@ -38,6 +38,7 @@
 
 typedef struct s_mini
 {
+	int		error;
 	char	*input;
 	char	**cmd_pipe;
 	char	**paths;
@@ -46,21 +47,111 @@ typedef struct s_mini
 	int		fd[10][2];
 	pid_t	pid[10];
 	int		n_cmd;
+	int		n_out;
 	char	*infile;
 	char	*outfile;
 	int		in_fd;
 	int		out_fd;
-	int		double_out;
+	int		append;
 	char	*limit;
-	char	*heredoc;
+	int		heredoc;
+	int		quote;
+	int		dquote;
+	char	**env;
+	char	**var;
+	int		env_len;
+	int		var_len;
+	int		p_exit;
 }	t_mini;
 
 /*
 **	EXEC
 */
-void	get_env_paths(t_mini *mini, char **envp);
-void	exec_cmd(t_mini mini, char *str, char **envp);
-void	interpreter(t_mini *mini, char **envp);
-void	pipex(t_mini *mini, char **envp);
+void	get_env_paths(t_mini *mini);
+void	exec_cmd(t_mini mini, char *str);
+void	interpreter(t_mini *mini);
+void	pipex(t_mini *mini);
+
+/*
+**	ENV
+*/
+
+/* exporta una variable de var a env */
+int		export(t_mini *mini, char *var_name);
+
+/* Recive el nombre de una variable y devuelve su contenido */
+char	*expand_var(char *name_var, char **env);
+
+/* Añana de una variable a var */
+void	enter_var(t_mini *mini, char *enter_var);
+
+/* Devuelve el nombre de la variable dentro de una cadena */
+char	*name_var(char *env_var);
+
+/* Crea una copia de **envp original para iniciar env y var */
+void	init_env(t_mini *mini, char **envp);
+
+/* Añade un nuevo char *str a un char **src */
+char	**add_str(char **src, char *str, int *len);
+
+/* Comprueba que la variable existe en la posicion i del char **src */
+int		contain_var(char **src, char *env_var, int i);
+
+/* Borra un char *var_name de un char **src */
+char	**del_var(char **src, char *var_name, int len);
+
+/* Busca en el char **src una variable con el mismo nombre que
+char *new_value y cambia el contenido */
+void	change_value(char **src, char *new_value);
+
+/* Retorna el numero de argumenos en mini->options */
+int		get_argc(t_mini *mini);
+
+/* Imprime las variables de env y var. SOLO DEBUG */
+void	print_env(t_mini *mini);
+
+/*
+*	INTERPRETER
+*/
+
+int		in_quote(t_mini *mini, char *str, int i);
+char	*in_double_quote(t_mini *mini, char *str, int i);
+int		has_heredoc(t_mini *mini, char *str, int i);
+int		has_infile(t_mini *mini, char *str);
+int		has_outfile(t_mini *mini, char *str, int i);
+int		is_cmd(t_mini *mini, char *str, int i, int j);
+int		has_var(t_mini *mini, char *str, int i, int j);
+char	*del_sep_space(t_mini *mini);
+
+/*
+*	BUILT-INS
+*/
+/* Built-in env sin opciones */
+int		built_env(t_mini *mini);
+
+/* Built-in con ruta relativa o absuluta */
+int		built_cd(t_mini *mini);
+
+/* Built-in export sin opciones */
+int		built_export(t_mini *mini);
+
+/* Built-in unset sin opciones */
+int		built_unset(t_mini *mini);
+
+/* Built-in echo con opcion -n */
+int		built_echo(t_mini *mini);
+
+/* Built-in exit con valor de terminación */
+int		built_exit(t_mini *mini);
+
+/* Built-in pwd sin opciones*/
+int		built_pwd(t_mini *mini);
+
+/*
+*	UTILS
+*/
+
+void	free_split(char **split);
+char	**cmd_split(t_mini *mini, char *str, char c);
 
 #endif

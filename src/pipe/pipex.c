@@ -21,6 +21,7 @@ void	free_split(char **split)
 		i++;
 	while (i >= 0)
 	{
+		//printf("free: %d\n", i);
 		free(split[i]);
 		i--;
 	}
@@ -57,20 +58,50 @@ char	*get_cmd(char **paths, char *cmd)
 		free(command);
 		paths++;
 	}
+	/* Añadir perror */
 	return (NULL);
 }
 
-/* version 2, comandos y ejecutables */
-void	exe_command(t_mini *mini, char *cmd, char **envp)
+int	exe_builtin(t_mini *mini)
 {
-	char	*cwd;
+	if (ft_strncmp(mini->options[0], "env", 3) == 0 
+		&& ft_strlen(mini->options[0]) == 3)
+		built_env(mini);
+	if (ft_strncmp(mini->options[0], "pwd", 3) == 0
+		&& ft_strlen(mini->options[0]) == 3)
+		built_pwd(mini);
+	if (ft_strncmp(mini->options[0], "export", 6) == 0
+		&& ft_strlen(mini->options[0]) == 6)
+		built_export(mini);
+	if (ft_strncmp(mini->options[0], "unset", 5) == 0
+		&& ft_strlen(mini->options[0]) == 5)
+		built_unset(mini);
+	if (ft_strncmp(mini->options[0], "echo", 4) == 0
+		&& ft_strlen(mini->options[0]) == 4)
+		built_echo(mini);
+	if (ft_strncmp(mini->options[0], "exit", 4) == 0
+		&& ft_strlen(mini->options[0]) == 4)
+		built_exit(mini);
+	if (ft_strncmp(mini->options[0], "cd", 2) == 0
+		&& ft_strlen(mini->options[0]) == 2)
+		built_cd(mini);
+	return (1);
+}
 
-	//printf("check\n");
-	cwd = NULL;
-	//cwd = ft_strdup(getcwd(cwd, sizeof(1024)));
-	cwd = ft_strdup("/home/fgalan-r/Minishell/PipexPlus");
-	//printf("cwd: %s\n", cwd);
-	mini->options = ft_split(cmd, ' ');
+/* v3 builtins, ejecutables y comandos */
+void	exe_command(t_mini *mini, char *cmd)
+{
+	char	cwd[100];
+/* 	int		i = 0; */
+
+	getcwd(cwd, sizeof(cwd));
+	mini->options = cmd_split(mini, cmd, ' ');
+/* 	while (mini->options[i])
+	{
+		printf("options[%d]: %s\n", i, mini->options[i]);
+		i++;
+	} */
+	exe_builtin(mini);
 	if (ft_strchr(mini->options[0], '/'))
 	{
 		if (ft_strncmp(mini->options[0], "./", 2) == 0)
@@ -90,7 +121,12 @@ void	exe_command(t_mini *mini, char *cmd, char **envp)
 	}
 	else
 		mini->cmd = get_cmd(mini->paths, mini->options[0]);
-	execve(mini->cmd, mini->options, envp);
+	if (mini->cmd != NULL)
+	{
+		execve(mini->cmd, mini->options, mini->env);	
+	}
+	else
+		exit(1);
 }
 
 void	close_fd(t_mini *mini)
@@ -130,7 +166,30 @@ void	dup_fd(t_mini *mini, int children)
 	}
 }
 
-void	exe_pipex(t_mini *mini, char **envp)
+// static void	close_processes(t_mini *mini)
+// {
+// 	int		i;
+
+// 	i = 0;
+// 	while (i < mini->n_cmd)
+// 	{
+// 		kill(mini->pid[i], 9);
+// 		i++;
+// 	}
+// }
+
+static void	wait_processes(t_mini *mini)
+{
+	int	state;
+
+	waitpid(-1, &state, 0);
+	mini->p_exit = WEXITSTATUS(state);
+	//if (mini->p_exit != 0)
+		//close_processes(mini);
+	/* printf("p_exit: %d\n", mini->p_exit); */
+}
+
+void	exe_pipex(t_mini *mini)
 {
 	int		i;
 
@@ -148,37 +207,55 @@ void	exe_pipex(t_mini *mini, char **envp)
 		{
 			dup_fd(mini, i);
 			close_fd(mini);
-			exe_command(mini, mini->cmd_pipe[i], envp);
+			exe_command(mini, mini->cmd_pipe[i]);
 		}
 		i++;
 	}
 	close_fd(mini);
-	waitpid(-1, NULL, 0);
+	wait_processes(mini);
+	//waitpid(-1, NULL, 0);
 }
 
-void	pipex(t_mini *mini, char **envp)
+int		exe_cd_exit(t_mini *mini)
+{
+	if (mini->cmd_pipe[0])//(mini->n_cmd > 0)
+	{
+		/* printf("comandos: %d\n", mini->n_cmd); */
+		//printf("comandos: %s\n", mini->cmd_pipe[0]);
+		
+		mini->options = cmd_split(mini, mini->cmd_pipe[0], ' ');
+		if (ft_strncmp(mini->options[0], "exit", 4) == 0
+			&& ft_strlen(mini->options[0]) == 4)
+			built_exit(mini);
+		if (ft_strncmp(mini->options[0], "cd", 2) == 0
+			&& ft_strlen(mini->options[0]) == 2)
+		{
+			built_cd(mini);
+			free_split(mini->options);
+			return (1);
+		}
+		free_split(mini->options);
+	}
+	return (0);
+}
+
+void	pipex(t_mini *mini)
 {
 	mini->in_fd = -2;
 	mini->out_fd = -2;
-	mini->double_out = 0; // ( 1 >> ) ( 0 > )
-	//mini->outfile = ft_strdup("./file.txt");
-	//mini->infile = ft_strdup("./infile.txt");
-	mini->heredoc = 1;
-	mini->limit = ft_strdup("fin");
 	if (mini->heredoc)
 	{
 		mini->infile = ft_strdup("./.infile.tmp");
 		heredoc(mini);
 	}
-	mini->infile = NULL;
-	mini->outfile = NULL;
 	if (mini->infile != NULL)
 		mini->in_fd = open(mini->infile, O_RDONLY);
-	if (mini->outfile != NULL && mini->double_out)
-		mini->out_fd = open(mini->outfile, O_APPEND | O_CREAT | O_RDWR, 0664); // O_APPEND escribe desde el final (redireccion >>)
-	else
-		mini->out_fd = open(mini->outfile, O_TRUNC | O_CREAT | O_RDWR, 0664); // O_TRUNC escribe desde el principio (redireccion >)
-	exe_pipex(mini, envp);
+	if (mini->outfile != NULL && mini->append)
+		mini->out_fd = open(mini->outfile, O_APPEND | O_CREAT | O_RDWR, 0664);
+	else if (mini->outfile != NULL)
+		mini->out_fd = open(mini->outfile, O_TRUNC | O_CREAT | O_RDWR, 0664);
+	if (exe_cd_exit(mini) == 0)
+		exe_pipex(mini);
 	if (mini->outfile != NULL)
 		close(mini->out_fd);
 	if (mini->infile != NULL)
@@ -187,26 +264,3 @@ void	pipex(t_mini *mini, char **envp)
 	mini->in_fd = -2;
 	mini->out_fd = -2;
 }
-
-	/* ejecutar programa */
-	// char	cwd[PATH_MAX];
-	// char	*path = NULL;
-	// if (getcwd(cwd, sizeof(cwd)) != NULL)
-	// 	printf("getcwd: %s\n", cwd);
-	// char **test_cmd = ft_split("./my_prog hola holita adios", ' ');
-	// if (test_cmd[0][0] == '.' && test_cmd[0][1] == '/')
-	// 	path = ft_strjoin(cwd, test_cmd[0] +1);
-	// else if (test_cmd[0][0] == '.' && test_cmd[0][1] == '.')
-	// {
-	// 	path = ft_strjoin(cwd, "/");
-	// 	path = ft_strjoin(path, test_cmd[0]);
-	// }
-	// else if (test_cmd[0][0] == '/')
-	// 	path = ft_strdup(test_cmd[0]);
-	// printf("prog path: %s\n", path);
-	// test_cmd[0] = ft_strdup(ft_strrchr(test_cmd[0], '/')+1);
-	// printf("test_cmd[0]: %s\n", test_cmd[0]);
-	// execve(path, test_cmd, envp);
-	/* ejecutar programa  v1 */
-	//char **test_cmd = ft_split("my_prog hola holita adios", ' ');
-	//execve("/home/fgalan-r/Minishell/PipexPlus/../PipexPlus/my_prog", test_cmd, envp);
