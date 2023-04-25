@@ -59,12 +59,7 @@ void	del_spaces(t_mini *mini)
 			i++;
 		while (mini->input[i] != ' ' && mini->input[i] != '\0')
 		{
-			if (mini->input[i] == '\'' || mini->input[i] == '\"')
-			{
-				if (mini->input[i] == '\"')
-					replace_var(mini, i);
-				str = not_del_spaces(mini, str, &i, &j);
-			}
+			str = is_var_or_quote(mini, str, &i, &j);
 			str[j++] = mini->input[i++];
 			if (mini->input[i] == ' ')
 				str[j++] = mini->input[i++];

@@ -58,13 +58,15 @@ char	*get_cmd(char **paths, char *cmd)
 		free(command);
 		paths++;
 	}
-	/* Añadir perror */
+	write(2, ERROR_CMD, ft_strlen(ERROR_CMD));
+	write(2, cmd, ft_strlen(cmd));
+	write(2, "\n", 1);
 	return (NULL);
 }
 
 int	exe_builtin(t_mini *mini)
 {
-	if (ft_strncmp(mini->options[0], "env", 3) == 0 
+	if (ft_strncmp(mini->options[0], "env", 3) == 0
 		&& ft_strlen(mini->options[0]) == 3)
 		built_env(mini);
 	if (ft_strncmp(mini->options[0], "pwd", 3) == 0
@@ -91,10 +93,12 @@ int	exe_builtin(t_mini *mini)
 /* v3 builtins, ejecutables y comandos */
 void	exe_command(t_mini *mini, char *cmd)
 {
-	char	cwd[100];
+	char	cwd[1000];
 /* 	int		i = 0; */
 
 	getcwd(cwd, sizeof(cwd));
+	// if (mini->options[0])
+	// 	free_split(mini->options);
 	mini->options = cmd_split(mini, cmd, ' ');
 /* 	while (mini->options[i])
 	{
@@ -123,10 +127,13 @@ void	exe_command(t_mini *mini, char *cmd)
 		mini->cmd = get_cmd(mini->paths, mini->options[0]);
 	if (mini->cmd != NULL)
 	{
-		execve(mini->cmd, mini->options, mini->env);	
+		execve(mini->cmd, mini->options, mini->env);
 	}
 	else
+	{
+		mini->p_exit = 1;
 		exit(1);
+	}
 }
 
 void	close_fd(t_mini *mini)
@@ -166,27 +173,21 @@ void	dup_fd(t_mini *mini, int children)
 	}
 }
 
-// static void	close_processes(t_mini *mini)
-// {
-// 	int		i;
-
-// 	i = 0;
-// 	while (i < mini->n_cmd)
-// 	{
-// 		kill(mini->pid[i], 9);
-// 		i++;
-// 	}
-// }
-
 static void	wait_processes(t_mini *mini)
 {
 	int	state;
 
 	waitpid(-1, &state, 0);
 	mini->p_exit = WEXITSTATUS(state);
-	//if (mini->p_exit != 0)
-		//close_processes(mini);
-	/* printf("p_exit: %d\n", mini->p_exit); */
+}
+
+static void	waiting(int iterations)
+{
+	int	i;
+
+	i = 0;
+	while (i < iterations)
+		i++;
 }
 
 void	exe_pipex(t_mini *mini)
@@ -200,6 +201,8 @@ void	exe_pipex(t_mini *mini)
 		i++;
 	}
 	i = 0;
+	signal(SIGUSR2, SIG_IGN);
+	mini->newline = 0;
 	while (i < mini->n_cmd)
 	{
 		mini->pid[i] = fork();
@@ -213,7 +216,9 @@ void	exe_pipex(t_mini *mini)
 	}
 	close_fd(mini);
 	wait_processes(mini);
-	//waitpid(-1, NULL, 0);
+	signal(SIGUSR2, process_on);
+	waiting(1000000);
+	mini->newline = 1;
 }
 
 int		exe_cd_exit(t_mini *mini)
@@ -222,7 +227,7 @@ int		exe_cd_exit(t_mini *mini)
 	{
 		/* printf("comandos: %d\n", mini->n_cmd); */
 		//printf("comandos: %s\n", mini->cmd_pipe[0]);
-		
+
 		mini->options = cmd_split(mini, mini->cmd_pipe[0], ' ');
 		if (ft_strncmp(mini->options[0], "exit", 4) == 0
 			&& ft_strlen(mini->options[0]) == 4)
@@ -261,6 +266,7 @@ void	pipex(t_mini *mini)
 	if (mini->infile != NULL)
 		close(mini->in_fd);
 	free_split(mini->paths);
+	free_split(mini->cmd_pipe);
 	mini->in_fd = -2;
 	mini->out_fd = -2;
 }

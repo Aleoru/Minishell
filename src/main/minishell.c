@@ -12,27 +12,38 @@
 
 #include "../../inc/minishell.h"
 
+void	ft_void(void)
+{
+	system("leaks -q minishell");
+}
+
 int	main(int argc, char **argv, char **envp)
 {
 	t_mini	mini;
-	char	cwd[PATH_MAX];
 
+	atexit(ft_void);
+	set_signals();
 	if (argc > 0 && argv[0])
 	{
 		ft_bzero(&mini, sizeof(t_mini));
 		mini.p_exit = 0;
-		if (getcwd(cwd, sizeof(cwd)) != NULL)
-			printf("Current dir: %s\n", cwd);
+		mini.newline = 1;
 		init_env(&mini, envp);
 		while (1)
 		{
-			mini.input = readline("\033[33;1mMiniHell> \033[0m");
-			if (ft_strlen(mini.input) == 4)
-				if (ft_memcmp("exit", mini.input, ft_strlen(mini.input)) == 0)
-					exit(EXIT_SUCCESS);
-			add_history(mini.input);
-			get_env_paths(&mini);
-			interpreter(&mini);
+			if (mini.newline == 1)
+			{
+				mini.input = readline("\033[33;1mMiniHell> \033[0m");
+				if (mini.input == NULL)
+					return (0);
+				if (ft_strlen(mini.input) != 0)
+				{
+					add_history(mini.input);
+					get_env_paths(&mini);
+					interpreter(&mini);
+				}
+				free(mini.input);
+			}
 		}
 	}
 	return (0);

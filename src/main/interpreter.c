@@ -19,17 +19,15 @@ void	split_cmd_line(t_mini *mini)
 	char	*str;
 
 	mini->cmd_pipe = ft_calloc(mini->n_cmd + 1, sizeof(char *));
-/* 	del_spaces(mini); */
 	str = del_sep_space(mini);
 /* 	printf("str:%s\n", str);	//borrar */
+	can_declare_var(mini, str);
 	i = has_infile(mini, str);
 	j = 0;
-	while (str[i] != '\0')
+	while (str[i] != '\0' && mini->declare == 0)
 	{
 		if ((str[i] == '|' && str[i + 1] != '|') || j < mini->n_cmd)
 			i = is_cmd(mini, str, i, j++);
-		if (str[i] == '$')
-			i = has_var(mini, str, i, j - 1);
 		if (str[i] == '>')
 			i = has_outfile(mini, str, i);
 		if (i == -1)
@@ -40,8 +38,8 @@ void	split_cmd_line(t_mini *mini)
 		if (str[i] == '\0')
 			break ;
 	}
-	printf("%d:%s\n", j - 1, mini->cmd_pipe[j - 1]);	//borrar
 	mini->cmd_pipe[j] = NULL;
+	free(str);
 }
 
 void	interpreter(t_mini *mini)
@@ -53,6 +51,7 @@ void	interpreter(t_mini *mini)
 	mini->n_out = 0;
 	mini->append = 0;
 	mini->heredoc = 0;
+	mini->declare = 0;
 	mini->infile = NULL;
 	mini->outfile = NULL;
 	while (mini->input[i])

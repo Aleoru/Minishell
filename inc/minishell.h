@@ -12,7 +12,7 @@
 
 #ifndef MINISHELL_H
 # define MINISHELL_H
-# define ERROR_CMD "Command not found\n"
+# define ERROR_CMD "Command not found: "
 
 # include <stdio.h>
 # include <stdlib.h>
@@ -33,6 +33,9 @@
 
 /* strerror */
 # include <string.h>
+
+/* signal */
+# include <signal.h>
 
 # include "../libft/inc/libft.h"
 
@@ -62,6 +65,8 @@ typedef struct s_mini
 	int		env_len;
 	int		var_len;
 	int		p_exit;
+	int		declare;
+	int		newline;
 }	t_mini;
 
 /*
@@ -120,8 +125,11 @@ int		has_heredoc(t_mini *mini, char *str, int i);
 int		has_infile(t_mini *mini, char *str);
 int		has_outfile(t_mini *mini, char *str, int i);
 int		is_cmd(t_mini *mini, char *str, int i, int j);
-int		has_var(t_mini *mini, char *str, int i, int j);
 char	*del_sep_space(t_mini *mini);
+char	*is_var_or_quote(t_mini *mini, char *str, int *i, int *j);
+void	replace_var(t_mini *mini, int i);
+char	*not_del_spaces(t_mini *mini, char *str, int *i, int *j);
+void	can_declare_var(t_mini *mini, char *str);
 
 /*
 *	BUILT-INS
@@ -146,6 +154,11 @@ int		built_exit(t_mini *mini);
 
 /* Built-in pwd sin opciones*/
 int		built_pwd(t_mini *mini);
+
+/* signals */
+void	set_signals(void);
+void	process_on(int signal);
+void	control_c(int sig);
 
 /*
 *	UTILS

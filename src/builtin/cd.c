@@ -31,7 +31,6 @@ int	built_cd(t_mini *mini)
 {
 	int	returned;
 
-	printf("estoy en cd\n");
 	if (get_argc(mini) == 2)
 	{
 		set_env_pwd(mini, "OLDPWD=");

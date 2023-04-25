@@ -133,29 +133,6 @@ int	is_cmd(t_mini *mini, char *str, int i, int j)
 		i++;
 	}
 	mini->cmd_pipe[j] = ft_substr(str, start, i - start);
-	printf("%d:%s\n", j, mini->cmd_pipe[j]);	//borrar
-	return (i);
-}
-
-int	has_var(t_mini *mini, char *str, int i, int j)
-{
-	int		start;
-	char	*var;
-	char	*tmp;
-
-	i++;
-	start = i;
-	while (str[i] != '|' && str[i] != '>' && str[i] != ' ' && str[i] != '$'
-		&& str[i] != '\0')
-		i++;
-	var = ft_substr(str, start, i - start);
-	if (ft_strnstr(var, "?", ft_strlen(var)))
-		tmp = ft_strjoin(mini->cmd_pipe[j], ft_itoa(mini->p_exit));
-	else
-		tmp = ft_strjoin(mini->cmd_pipe[j], expand_var(var, mini->env));
-/* 	printf("tmp:%s\n", tmp);	//borrar */
-	mini->cmd_pipe[j] = tmp;
-	free(var);
-	printf("%d:%s\n", j, mini->cmd_pipe[j]); //borrar
+	/* printf("%d:%s\n", j, mini->cmd_pipe[j]);	//borrar */
 	return (i);
 }

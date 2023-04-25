@@ -14,7 +14,13 @@ static int	is_number(char *str)
 	return (1);
 }
 
-int built_exit(t_mini *mini)
+void	free_mini(t_mini *mini)
+{
+	(void)mini;
+	rl_clear_history();
+}
+
+int	built_exit(t_mini *mini)
 {
 	int	len;
 	int	ret;
@@ -29,19 +35,19 @@ int built_exit(t_mini *mini)
 		if (is_number(mini->options[1]))
 		{
 			ret = ft_atoi(mini->options[1]);
-			//free_mini(mini);
+			free_mini(mini);
 			exit(ret);
 		}
 		else
 		{
 			write(2, "exit: need numeric argument", 27);
-			//free_mini(mini);
+			free_mini(mini);
 			exit(2);
 		}
 	}
 	if (len == 1)
 	{
-		//free_mini(mini);
+		free_mini(mini);
 		exit(0);
 	}
 	return (1);
