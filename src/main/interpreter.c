@@ -12,7 +12,43 @@
 
 #include "../../inc/minishell.h"
 
-void	split_cmd_line(t_mini *mini)
+void init_mini(t_mini *mini)
+{
+	mini->n_cmd = 0;
+	mini->n_out = 0;
+	mini->append = 0;
+	mini->heredoc = 0;
+	mini->declare = 0;
+	mini->infile = NULL;
+	mini->outfile = NULL;
+	mini->quote = 0;
+	mini->dquote = 0;
+	mini->error = 0;
+}
+
+int	syntax_validation(t_mini *mini)
+{
+	int	i;
+	int	check;
+
+	i = 0;
+	check = 0;
+	while (mini->input[i])
+	{
+		if (ft_strchr("<|>", mini->input[i]))
+			check++;
+		if (ft_isalnum(mini->input[i]))
+			check = 0;
+		if (check > 2)
+			return (-1);
+		i++;
+	}
+	if (check > 2)
+			return (-1);
+	return (0);
+}
+
+int	split_cmd_line(t_mini *mini)
 {
 	int		i;
 	int		j;
@@ -21,6 +57,8 @@ void	split_cmd_line(t_mini *mini)
 	mini->cmd_pipe = ft_calloc(mini->n_cmd + 1, sizeof(char *));
 	str = del_sep_space(mini);
 /* 	printf("str:%s\n", str);	//borrar */
+	if (mini->error == -1)
+		return (free(str), -1);
 	can_declare_var(mini, str);
 	i = has_infile(mini, str);
 	j = 0;
@@ -31,15 +69,13 @@ void	split_cmd_line(t_mini *mini)
 		if (str[i] == '>')
 			i = has_outfile(mini, str, i);
 		if (i == -1)
-		{
-			mini->error = -1;
-			return ;
-		}
+			return (free(str), -1);
 		if (str[i] == '\0')
 			break ;
 	}
 	mini->cmd_pipe[j] = NULL;
 	free(str);
+	return (0);
 }
 
 void	interpreter(t_mini *mini)
@@ -47,13 +83,13 @@ void	interpreter(t_mini *mini)
 	int	i;
 
 	i = 0;
-	mini->n_cmd = 0;
-	mini->n_out = 0;
-	mini->append = 0;
-	mini->heredoc = 0;
-	mini->declare = 0;
-	mini->infile = NULL;
-	mini->outfile = NULL;
+	init_mini(mini);
+	if (syntax_validation(mini) == -1)
+	{
+		write(2, ERROR_SYN, ft_strlen(ERROR_SYN));
+		mini->p_exit = 2;
+		return ;
+	}
 	while (mini->input[i])
 	{
 		if (mini->input[i] == '|')
@@ -66,9 +102,12 @@ void	interpreter(t_mini *mini)
 	}
 	mini->n_cmd++;
 	/* printf("Nº cmd: %d\n", mini->n_cmd);	//borrar */
-	split_cmd_line(mini);
-	if (mini->error == -1)
+	if (split_cmd_line(mini) == -1)
+	{
+		write(2, ERROR_SYN, ft_strlen(ERROR_SYN));
+		mini->p_exit = 2;
 		return ;
+	}
 /* 	mini->fd = ft_calloc(mini->n_cmd, 2 * sizeof(int));
 	mini->pid = malloc(mini->n_cmd * sizeof(pid_t)); */
 	pipex(mini);

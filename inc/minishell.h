@@ -13,6 +13,7 @@
 #ifndef MINISHELL_H
 # define MINISHELL_H
 # define ERROR_CMD "Command not found: "
+# define ERROR_SYN "Syntax error\n"
 
 # include <stdio.h>
 # include <stdlib.h>
@@ -86,6 +87,7 @@ int		export(t_mini *mini, char *var_name);
 
 /* Recive el nombre de una variable y devuelve su contenido */
 char	*expand_var(char *name_var, char **env);
+char	*expand_var_all(t_mini *mini, char *name_var);
 
 /* Añana de una variable a var */
 void	enter_var(t_mini *mini, char *enter_var);

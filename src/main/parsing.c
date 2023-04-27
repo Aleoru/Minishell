@@ -21,9 +21,9 @@ int	has_heredoc(t_mini *mini, char *str, int i)
 		i += 1;
 	i++;
 	start = i;
-	while (str[i] != ' ')
+	while (str[i] != ' ' && str[i] != '\0')
 		i++;
-	mini->limit = ft_substr(str, start, i - start);
+	mini->limit = ft_substr(str, start, i - start);	
 	/* printf("Limit:%s\n", mini->limit);	//borrar */
 	mini->heredoc = 1;
 	return (i);
@@ -133,6 +133,6 @@ int	is_cmd(t_mini *mini, char *str, int i, int j)
 		i++;
 	}
 	mini->cmd_pipe[j] = ft_substr(str, start, i - start);
-	/* printf("%d:%s\n", j, mini->cmd_pipe[j]);	//borrar */
+/* 	printf("%d:%s\n", j, mini->cmd_pipe[j]);	//borrar */
 	return (i);
 }

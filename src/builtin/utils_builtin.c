@@ -23,7 +23,31 @@ int	get_argc(t_mini *mini)
 	return (len);
 }
 
-/* recive el nombre de una variable y devuelve su contenido */
+/* recibe el nombre de una variable y devuelve su contenido */
+/* char	*expand_var(char *name_var, char **env)
+{
+	char	*var;
+	char	*tmp;
+	int		i;
+
+	i = 0;
+	tmp = ft_strjoin(name_var, "=");
+	while (env[i])
+	{
+		var = ft_strnstr(env[i], tmp, ft_strlen(tmp));
+		if (var)
+		{
+			var = ft_strdup(env[i] + ft_strlen(tmp));
+			free(tmp);
+			return (var);
+		}
+		i++;
+	}
+	free(tmp);
+	free(var);
+	return (NULL);
+} */
+
 char	*expand_var(char *name_var, char **env)
 {
 	char	*var;
@@ -43,6 +67,16 @@ char	*expand_var(char *name_var, char **env)
 		i++;
 	}
 	free(tmp);
+	return (var);
+}
+
+char	*expand_var_all(t_mini *mini, char *name_var)
+{
+	char	*var;
+
+	var = expand_var(name_var, mini->env);
+	if (var == NULL)
+		var = expand_var(name_var, mini->var);
 	return (var);
 }
 

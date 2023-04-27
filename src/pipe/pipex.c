@@ -223,11 +223,8 @@ void	exe_pipex(t_mini *mini)
 
 int		exe_cd_exit(t_mini *mini)
 {
-	if (mini->cmd_pipe[0])//(mini->n_cmd > 0)
+	if (mini->cmd_pipe[0])
 	{
-		/* printf("comandos: %d\n", mini->n_cmd); */
-		//printf("comandos: %s\n", mini->cmd_pipe[0]);
-
 		mini->options = cmd_split(mini, mini->cmd_pipe[0], ' ');
 		if (ft_strncmp(mini->options[0], "exit", 4) == 0
 			&& ft_strlen(mini->options[0]) == 4)
@@ -236,6 +233,20 @@ int		exe_cd_exit(t_mini *mini)
 			&& ft_strlen(mini->options[0]) == 2)
 		{
 			built_cd(mini);
+			free_split(mini->options);
+			return (1);
+		}
+		if (ft_strncmp(mini->options[0], "unset", 5) == 0
+			&& ft_strlen(mini->options[0]) == 5)
+		{
+			built_unset(mini);
+			free_split(mini->options);
+			return (1);
+		}
+		if (ft_strncmp(mini->options[0], "export", 6) == 0
+			&& ft_strlen(mini->options[0]) == 6)
+		{
+			built_export(mini);
 			free_split(mini->options);
 			return (1);
 		}

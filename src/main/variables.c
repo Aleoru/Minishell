@@ -20,14 +20,22 @@ char	*has_var(t_mini *mini, char *str, int *i)
 
 	*i += 1;
 	start = *i;
-	while (!ft_strchr("<|> \0", mini->input[*i]))
+	if (mini->input[*i] == '?')
+	{
+		*i += 1;
+		tmp = ft_strjoin(str, ft_itoa(mini->p_exit));
+		free(str);
+		return (tmp);
+	}
+		tmp = ft_strjoin(str, ft_itoa(mini->p_exit));
+	while (ft_isalnum(mini->input[*i]) && mini->input[*i] != '\0')
 		*i += 1;
 	var = ft_substr(mini->input, start, *i - start);
 /* 	printf("var:%s\n", var); */
-	if (ft_strnstr(var, "?", ft_strlen(var)))
-		tmp = ft_strjoin(str, ft_itoa(mini->p_exit));
-	else
-		tmp = ft_strjoin(str, expand_var(var, mini->env));
+	if (expand_var_all(mini, var))
+		tmp = ft_strjoin(str, expand_var_all(mini, var));
+	else if (!expand_var_all(mini, var))
+		tmp = ft_strdup(str);
 /* 	printf("tmp:%s\n", tmp);	//borrar */
 	free(var);
 	return (tmp);
@@ -120,6 +128,6 @@ void	can_declare_var(t_mini *mini, char *str)
 		if (str[i] == '\0')
 			break ;
 	}
-	printf("La input entera es declaración\n");
+/* 	printf("La input entera es declaración\n"); */
 	var_syntax(mini, str);
 }
