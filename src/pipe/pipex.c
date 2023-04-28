@@ -65,14 +65,11 @@ char	*get_cmd(char **paths, char *cmd)
 
 int	exe_builtin(t_mini *mini)
 {
-	if (ft_strncmp(mini->options[0], "env", 3) == 0
-		&& ft_strlen(mini->options[0]) == 3)
+	if (!ft_strncmp(mini->options[0], "env", ft_strlen(mini->options[0])))
 		built_env(mini);
-	if (ft_strncmp(mini->options[0], "pwd", 3) == 0
-		&& ft_strlen(mini->options[0]) == 3)
+	if (!ft_strncmp(mini->options[0], "pwd", ft_strlen(mini->options[0])))
 		built_pwd(mini);
-	if (ft_strncmp(mini->options[0], "echo", 4) == 0
-		&& ft_strlen(mini->options[0]) == 4)
+	if (!ft_strncmp(mini->options[0], "echo", ft_strlen(mini->options[0])))
 		built_echo(mini);
 	return (1);
 }
