@@ -13,6 +13,7 @@
 #ifndef MINISHELL_H
 # define MINISHELL_H
 # define ERROR_CMD "Command not found: "
+# define ERROR_SYN "Syntax error\n"
 
 # include <stdio.h>
 # include <stdlib.h>
@@ -86,6 +87,7 @@ int		export(t_mini *mini, char *var_name);
 
 /* Recive el nombre de una variable y devuelve su contenido */
 char	*expand_var(char *name_var, char **env);
+char	*expand_var_all(t_mini *mini, char *name_var);
 
 /* Añana de una variable a var */
 void	enter_var(t_mini *mini, char *enter_var);
@@ -111,6 +113,9 @@ void	change_value(char **src, char *new_value);
 
 /* Retorna el numero de argumenos en mini->options */
 int		get_argc(t_mini *mini);
+
+/* Acualiza la variable SHLVL */
+void	shell_level(t_mini *mini);
 
 /* Imprime las variables de env y var. SOLO DEBUG */
 void	print_env(t_mini *mini);
@@ -165,6 +170,10 @@ void	control_c(int sig);
 */
 
 void	free_split(char **split);
+void	free_mini(t_mini *mini);
 char	**cmd_split(t_mini *mini, char *str, char c);
+int		split_len(char **split);
+char	**cpy_split(char **split);
+void	sort_strings(char **split);
 
 #endif

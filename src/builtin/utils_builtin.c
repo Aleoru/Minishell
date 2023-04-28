@@ -46,6 +46,16 @@ char	*expand_var(char *name_var, char **env)
 	return (var);
 }
 
+char	*expand_var_all(t_mini *mini, char *name_var)
+{
+	char	*var;
+
+	var = expand_var(name_var, mini->env);
+	if (var == NULL)
+		var = expand_var(name_var, mini->var);
+	return (var);
+}
+
 /* Añana de una variable a var */
 void	enter_var(t_mini *mini, char *enter_var)
 {
@@ -69,3 +79,37 @@ void	enter_var(t_mini *mini, char *enter_var)
 		mini->var = add_str(mini->var, enter_var, &mini->var_len);
 	free(name);
 }
+
+// char	*expand_var2(t_mini *mini, char *name_var)
+// {
+// 	char	*var;
+// 	char	*tmp;
+// 	int		i;
+
+// 	i = 0;
+// 	tmp = ft_strjoin(name_var, "=");
+// 	while (mini->env[i])
+// 	{
+// 		var = ft_strnstr(mini->env[i], tmp, ft_strlen(tmp));
+// 		if (var)
+// 		{
+// 			var = ft_strdup(mini->env[i] + ft_strlen(tmp));
+// 			break ;
+// 		}
+// 		i++;
+// 	}
+// 	i = 0;
+// 	while (mini->var[i])
+// 	{
+// 		var = ft_strnstr(mini->var[i], tmp, ft_strlen(tmp));
+// 		if (var)
+// 		{
+// 			var = ft_strdup(mini->var[i] + ft_strlen(tmp));
+// 			break ;
+// 		}
+// 		i++;
+// 	}
+// 	free(tmp);
+// 	return (var);	
+// }
+

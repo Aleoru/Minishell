@@ -15,8 +15,10 @@ SRCDIR	= src
 OBJDIR	= obj
 LIBFT	= libft
 
-INC		= -I ./inc -I $(LIBFT)/inc
-LFLAGS	= -L$(LIBFT) -lft -lreadline
+#INC	= -I ./inc -I $(LIBFT)/inc
+#LFLAGS	= -L$(LIBFT) -lft -lreadline
+INC		= -I ./inc -I $(LIBFT)/inc -I/Users/$(USER)/.brew/opt/readline/include
+LFLAGS	= -L$(LIBFT) -lft -L/Users/$(USER)/.brew/opt/readline/lib -lreadline
 SRC		:= $(wildcard $(SRCDIR)/*/*.c)
 OBJS	:= $(patsubst $(SRCDIR)/%.c, $(OBJDIR)/%.o, $(SRC))
 

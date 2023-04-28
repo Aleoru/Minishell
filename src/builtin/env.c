@@ -51,6 +51,21 @@ void	init_env(t_mini *mini, char **envp)
 	mini->env[mini->env_len] = NULL;
 	mini->var[mini->env_len] = NULL;
 	mini->var_len = mini->env_len;
+	shell_level(mini);
+}
+
+void	shell_level(t_mini *mini)
+{
+	int		level;
+	char	*new;
+	char	*aux;
+
+	level = ft_atoi(expand_var("SHLVL", mini->env));
+	level++;
+	aux = ft_itoa(level);
+	new = ft_strjoin("SHLVL=", aux);
+	enter_var(mini, new);
+	free(aux);
 }
 
 /* Imprime las variables de env y var. SOLO DEBUG */

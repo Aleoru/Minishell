@@ -24,7 +24,7 @@ int	in_quote(t_mini *mini, char *str, int i)
 	}
 	if (str[i] == '\0' && mini->quote)
 	{
-		write(2, "\033[31;1mError: Syntax Error\n\033[0m", 20);
+		mini->error = -1;
 		return (-1);
 	}
 	return (i);
@@ -38,15 +38,21 @@ char	*search_var(t_mini *mini, char *str, char *aux, int *i)
 
 	*i += 1;
 	start = *i;
-	while (str[*i] != ' ' && str[*i] != '\"' && str[*i] != '\''
-		&& str[*i] != '$' && str[*i] != '\0')
+	if (str[*i] == '?')
+	{
+		*i += 1;
+		tmp = ft_strjoin(aux, ft_itoa(mini->p_exit));
+		free(aux);
+		return (tmp);
+	}
+	while (ft_isalnum(str[*i]) && str[*i] != '\0')
 		*i += 1;
 	var = ft_substr(str, start, *i - start);
 /* 	printf("var: %s\n", expand_var(var, mini->env)); */
-	if (ft_strnstr(var, "?", ft_strlen(var)))
-		tmp = ft_strjoin(aux, ft_itoa(mini->p_exit));
+	if (expand_var_all(mini, var))
+		tmp = ft_strjoin(aux, expand_var_all(mini, var));
 	else
-		tmp = ft_strjoin(aux, expand_var(var, mini->env));
+		tmp = ft_strdup(aux);
 	free(var);
 	free(aux);
 	return (tmp);
@@ -77,10 +83,11 @@ char	*in_double_quote(t_mini *mini, char *str, int i)
 			while (aux[i])
 				i++;
 		}
-		if (str[j] != '$')
+		if (str[j] != '$' && str[j] != '\"')
 			aux[i++] = str[j++];
 	}
 	tmp = ft_strjoin(aux, &str[j]);
-/*  	printf("tmp: %s\n", tmp);	// borrar */
+	if (mini->dquote)
+		mini->error = -1;
 	return (tmp);
 }

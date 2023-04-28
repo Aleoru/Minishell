@@ -21,7 +21,6 @@ void	free_split(char **split)
 		i++;
 	while (i >= 0)
 	{
-		//printf("free: %d\n", i);
 		free(split[i]);
 		i--;
 	}
@@ -72,21 +71,9 @@ int	exe_builtin(t_mini *mini)
 	if (ft_strncmp(mini->options[0], "pwd", 3) == 0
 		&& ft_strlen(mini->options[0]) == 3)
 		built_pwd(mini);
-	if (ft_strncmp(mini->options[0], "export", 6) == 0
-		&& ft_strlen(mini->options[0]) == 6)
-		built_export(mini);
-	if (ft_strncmp(mini->options[0], "unset", 5) == 0
-		&& ft_strlen(mini->options[0]) == 5)
-		built_unset(mini);
 	if (ft_strncmp(mini->options[0], "echo", 4) == 0
 		&& ft_strlen(mini->options[0]) == 4)
 		built_echo(mini);
-	if (ft_strncmp(mini->options[0], "exit", 4) == 0
-		&& ft_strlen(mini->options[0]) == 4)
-		built_exit(mini);
-	if (ft_strncmp(mini->options[0], "cd", 2) == 0
-		&& ft_strlen(mini->options[0]) == 2)
-		built_cd(mini);
 	return (1);
 }
 
@@ -94,17 +81,9 @@ int	exe_builtin(t_mini *mini)
 void	exe_command(t_mini *mini, char *cmd)
 {
 	char	cwd[1000];
-/* 	int		i = 0; */
 
 	getcwd(cwd, sizeof(cwd));
-	// if (mini->options[0])
-	// 	free_split(mini->options);
 	mini->options = cmd_split(mini, cmd, ' ');
-/* 	while (mini->options[i])
-	{
-		printf("options[%d]: %s\n", i, mini->options[i]);
-		i++;
-	} */
 	exe_builtin(mini);
 	if (ft_strchr(mini->options[0], '/'))
 	{
@@ -201,8 +180,8 @@ void	exe_pipex(t_mini *mini)
 		i++;
 	}
 	i = 0;
-	signal(SIGUSR2, SIG_IGN);
-	mini->newline = 0;
+	// signal(SIGUSR2, SIG_IGN);
+	// mini->newline = 0;
 	while (i < mini->n_cmd)
 	{
 		mini->pid[i] = fork();
@@ -216,18 +195,15 @@ void	exe_pipex(t_mini *mini)
 	}
 	close_fd(mini);
 	wait_processes(mini);
-	signal(SIGUSR2, process_on);
-	waiting(1000000);
-	mini->newline = 1;
+	// signal(SIGUSR2, process_on);
+	// waiting(1000000);
+	// mini->newline = 1;
 }
 
 int		exe_cd_exit(t_mini *mini)
 {
-	if (mini->cmd_pipe[0])//(mini->n_cmd > 0)
+	if (mini->cmd_pipe[0])
 	{
-		/* printf("comandos: %d\n", mini->n_cmd); */
-		//printf("comandos: %s\n", mini->cmd_pipe[0]);
-
 		mini->options = cmd_split(mini, mini->cmd_pipe[0], ' ');
 		if (ft_strncmp(mini->options[0], "exit", 4) == 0
 			&& ft_strlen(mini->options[0]) == 4)
@@ -236,6 +212,20 @@ int		exe_cd_exit(t_mini *mini)
 			&& ft_strlen(mini->options[0]) == 2)
 		{
 			built_cd(mini);
+			free_split(mini->options);
+			return (1);
+		}
+		if (ft_strncmp(mini->options[0], "unset", 5) == 0
+			&& ft_strlen(mini->options[0]) == 5)
+		{
+			built_unset(mini);
+			free_split(mini->options);
+			return (1);
+		}
+		if (ft_strncmp(mini->options[0], "export", 6) == 0
+			&& ft_strlen(mini->options[0]) == 6)
+		{
+			built_export(mini);
 			free_split(mini->options);
 			return (1);
 		}
@@ -259,8 +249,13 @@ void	pipex(t_mini *mini)
 		mini->out_fd = open(mini->outfile, O_APPEND | O_CREAT | O_RDWR, 0664);
 	else if (mini->outfile != NULL)
 		mini->out_fd = open(mini->outfile, O_TRUNC | O_CREAT | O_RDWR, 0664);
+	signal(SIGUSR2, SIG_IGN);
+	mini->newline = 0;
 	if (exe_cd_exit(mini) == 0)
 		exe_pipex(mini);
+	signal(SIGUSR2, process_on);
+	waiting(1000000);
+	mini->newline = 1;
 	if (mini->outfile != NULL)
 		close(mini->out_fd);
 	if (mini->infile != NULL)

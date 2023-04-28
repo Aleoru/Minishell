@@ -31,7 +31,7 @@ char	*not_del_spaces(t_mini *mini, char *str, int *i, int *j)
 	str[*j] = mini->input[*i];
 	*i += 1;
 	*j += 1;
-	while (mini->quote || mini->dquote)
+	while ((mini->quote || mini->dquote) && mini->input[*i] != '\0')
 	{
 		if (mini->input[*i] == '\'')
 			mini->quote = 0;
@@ -41,6 +41,8 @@ char	*not_del_spaces(t_mini *mini, char *str, int *i, int *j)
 		*j += 1;
 		*i += 1;
 	}
+	if (mini->quote || mini->dquote)
+		mini->error = -1;
 	return (str);
 }
 
@@ -84,7 +86,8 @@ char	*deleting_spaces(t_mini *mini, char *str, int *i, int *j)
 	}
 	else if (ft_strchr("<|>", mini->input[*i]) && mini->input[*i + 1] == ' ')
 	{
-		str[*j++] = mini->input[*i];
+		str[*j] = mini->input[*i];
+		*j += 1;
 		*i += 2;
 	}
 	return (str);
@@ -100,14 +103,14 @@ char	*del_sep_space(t_mini *mini)
 	j = 0;
 	del_spaces(mini);
 	str = ft_calloc(1, ft_strlen(mini->input) * sizeof(char));
-	/* printf("input:%s\n", mini->input);	// borrar */
+/* 	printf("input:%s\n", mini->input);	// borrar */
 	while (mini->input[i])
 	{
 		if (mini->input[i] == '\'' || mini->input[i] == '\"')
 			str = not_del_spaces(mini, str, &i, &j);
 		if (!mini->input[i])
 			break ;
-		if (ft_strchr("<|>", mini->input[i]))
+		if (!ft_strchr("<|>", mini->input[i + 1]) && ft_strchr("<|>", mini->input[i]))
 			str = deleting_spaces(mini, str, &i, &j);
 		str[j++] = mini->input[i++];
 	}

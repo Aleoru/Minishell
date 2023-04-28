@@ -39,12 +39,12 @@ int	built_unset(t_mini *mini)
 	int		i;
 
 	i = 1;
-	while (mini->options)
+	while (mini->options[i])
 	{
 		unset(mini, mini->options[i]);
 		i++;
 	}
-	exit(0);
+	return (0);
 }
 
 

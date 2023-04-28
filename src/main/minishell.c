@@ -21,7 +21,7 @@ int	main(int argc, char **argv, char **envp)
 {
 	t_mini	mini;
 
-	atexit(ft_void);
+	//atexit(ft_void);
 	set_signals();
 	if (argc > 0 && argv[0])
 	{
@@ -35,7 +35,7 @@ int	main(int argc, char **argv, char **envp)
 			{
 				mini.input = readline("\033[33;1mMiniHell> \033[0m");
 				if (mini.input == NULL)
-					return (0);
+					return (free_mini(&mini), 0);
 				if (ft_strlen(mini.input) != 0)
 				{
 					add_history(mini.input);
