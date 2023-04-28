@@ -103,14 +103,14 @@ char	*del_sep_space(t_mini *mini)
 	j = 0;
 	del_spaces(mini);
 	str = ft_calloc(1, ft_strlen(mini->input) * sizeof(char));
-/* 	printf("input:%s\n", mini->input);	// borrar */
 	while (mini->input[i])
 	{
 		if (mini->input[i] == '\'' || mini->input[i] == '\"')
 			str = not_del_spaces(mini, str, &i, &j);
 		if (!mini->input[i])
 			break ;
-		if (!ft_strchr("<|>", mini->input[i + 1]) && ft_strchr("<|>", mini->input[i]))
+		if (!ft_strchr("<|>", mini->input[i + 1])
+			&& ft_strchr("<|>", mini->input[i]))
 			str = deleting_spaces(mini, str, &i, &j);
 		str[j++] = mini->input[i++];
 	}

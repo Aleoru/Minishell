@@ -50,7 +50,7 @@ void    sort_strings(char **split)
     }
 }
 
-int		split_len(char **split)
+int	split_len(char **split)
 {
 	int		i;
 

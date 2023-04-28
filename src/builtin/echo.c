@@ -32,6 +32,6 @@ int	built_echo(t_mini *mini)
 	}
 	if (jump == 1)
 		printf("\n");
-
+	free_son(mini);
 	exit(0);
 }

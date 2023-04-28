@@ -26,5 +26,6 @@ int	built_pwd(t_mini *mini)
 		write(2, "pwd: to many arguments", 23);
 		return (2);
 	}
+	free_son(mini);
 	exit(0);
 }

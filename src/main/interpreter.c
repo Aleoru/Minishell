@@ -12,7 +12,7 @@
 
 #include "../../inc/minishell.h"
 
-void init_mini(t_mini *mini)
+void	init_mini(t_mini *mini)
 {
 	mini->n_cmd = 0;
 	mini->n_out = 0;
@@ -44,7 +44,7 @@ int	syntax_validation(t_mini *mini)
 		i++;
 	}
 	if (check > 2)
-			return (-1);
+		return (-1);
 	return (0);
 }
 
@@ -54,12 +54,14 @@ int	split_cmd_line(t_mini *mini)
 	int		j;
 	char	*str;
 
-	mini->cmd_pipe = ft_calloc(mini->n_cmd + 1, sizeof(char *));
 	str = del_sep_space(mini);
 /* 	printf("str:%s\n", str);	//borrar */
 	if (mini->error == -1)
 		return (free(str), -1);
 	can_declare_var(mini, str);
+	if (mini->declare == 1)
+		mini->n_cmd = 0;
+	mini->cmd_pipe = ft_calloc(mini->n_cmd + 1, sizeof(char *));
 	i = has_infile(mini, str);
 	j = 0;
 	while (str[i] != '\0' && mini->declare == 0)
@@ -74,8 +76,7 @@ int	split_cmd_line(t_mini *mini)
 			break ;
 	}
 	mini->cmd_pipe[j] = NULL;
-	free(str);
-	return (0);
+	return (free(str), 0);
 }
 
 void	interpreter(t_mini *mini)
@@ -101,7 +102,6 @@ void	interpreter(t_mini *mini)
 		i++;
 	}
 	mini->n_cmd++;
-	/* printf("Nº cmd: %d\n", mini->n_cmd);	//borrar */
 	if (split_cmd_line(mini) == -1)
 	{
 		write(2, ERROR_SYN, ft_strlen(ERROR_SYN));
@@ -110,5 +110,6 @@ void	interpreter(t_mini *mini)
 	}
 /* 	mini->fd = ft_calloc(mini->n_cmd, 2 * sizeof(int));
 	mini->pid = malloc(mini->n_cmd * sizeof(pid_t)); */
-	pipex(mini);
+	if (mini->n_cmd > 0)
+		pipex(mini);
 }

@@ -21,7 +21,7 @@ int	main(int argc, char **argv, char **envp)
 {
 	t_mini	mini;
 
-	//atexit(ft_void);
+	atexit(ft_void);
 	set_signals();
 	if (argc > 0 && argv[0])
 	{
@@ -41,6 +41,7 @@ int	main(int argc, char **argv, char **envp)
 					add_history(mini.input);
 					get_env_paths(&mini);
 					interpreter(&mini);
+					free_split(mini.paths);
 				}
 				free(mini.input);
 			}

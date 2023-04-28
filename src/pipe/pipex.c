@@ -42,6 +42,7 @@ void	heredoc(t_mini *mini)
 		free(buf);
 	}
 	free(buf);
+	free(mini->limit);
 	close(mini->in_fd);
 }
 
@@ -79,32 +80,26 @@ void	exe_command(t_mini *mini, char *cmd)
 {
 	char	cwd[1000];
 
+	(void)cmd;
 	getcwd(cwd, sizeof(cwd));
-	mini->options = cmd_split(mini, cmd, ' ');
 	exe_builtin(mini);
 	if (ft_strchr(mini->options[0], '/'))
 	{
 		if (ft_strncmp(mini->options[0], "./", 2) == 0)
-		{
 			mini->cmd = ft_strjoin(cwd, mini->options[0] + 1);
-		}
 		else if (ft_strncmp(mini->options[0], "..", 2) == 0)
 		{
 			mini->cmd = ft_strjoin(cwd, "/");
 			mini->cmd = ft_strjoin(cwd, mini->options[0]);
 		}
 		else if (ft_strncmp(mini->options[0], "/", 1) == 0)
-		{
 			mini->cmd = ft_strdup(mini->options[0]);
-		}
 		mini->options[0] = ft_strdup(ft_strrchr(mini->options[0], '/') + 1);
 	}
 	else
 		mini->cmd = get_cmd(mini->paths, mini->options[0]);
 	if (mini->cmd != NULL)
-	{
 		execve(mini->cmd, mini->options, mini->env);
-	}
 	else
 	{
 		mini->p_exit = 1;
@@ -177,10 +172,9 @@ void	exe_pipex(t_mini *mini)
 		i++;
 	}
 	i = 0;
-	// signal(SIGUSR2, SIG_IGN);
-	// mini->newline = 0;
 	while (i < mini->n_cmd)
 	{
+		mini->options = cmd_split(mini, mini->cmd_pipe[i], ' ');
 		mini->pid[i] = fork();
 		if (mini->pid[i] == 0)
 		{
@@ -188,13 +182,11 @@ void	exe_pipex(t_mini *mini)
 			close_fd(mini);
 			exe_command(mini, mini->cmd_pipe[i]);
 		}
+		free_split(mini->options);
 		i++;
 	}
 	close_fd(mini);
 	wait_processes(mini);
-	// signal(SIGUSR2, process_on);
-	// waiting(1000000);
-	// mini->newline = 1;
 }
 
 int		exe_cd_exit(t_mini *mini)
@@ -248,16 +240,21 @@ void	pipex(t_mini *mini)
 		mini->out_fd = open(mini->outfile, O_TRUNC | O_CREAT | O_RDWR, 0664);
 	signal(SIGUSR2, SIG_IGN);
 	mini->newline = 0;
-	if (exe_cd_exit(mini) == 0)
+	if (exe_cd_exit(mini) == 0 && mini->cmd_pipe[0])
 		exe_pipex(mini);
 	signal(SIGUSR2, process_on);
 	waiting(1000000);
 	mini->newline = 1;
 	if (mini->outfile != NULL)
+	{
 		close(mini->out_fd);
+		free(mini->outfile);
+	}
 	if (mini->infile != NULL)
+	{
 		close(mini->in_fd);
-	free_split(mini->paths);
+		free(mini->infile);
+	}
 	free_split(mini->cmd_pipe);
 	mini->in_fd = -2;
 	mini->out_fd = -2;

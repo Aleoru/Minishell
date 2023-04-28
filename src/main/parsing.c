@@ -23,7 +23,7 @@ int	has_heredoc(t_mini *mini, char *str, int i)
 	start = i;
 	while (str[i] != ' ' && str[i] != '\0')
 		i++;
-	mini->limit = ft_substr(str, start, i - start);	
+	mini->limit = ft_substr(str, start, i - start);
 	/* printf("Limit:%s\n", mini->limit);	//borrar */
 	mini->heredoc = 1;
 	return (i);
@@ -105,12 +105,11 @@ int	has_outfile(t_mini *mini, char *str, int i)
 		outfile = ft_substr(str, start, i - start);
 		mini->outfile = ft_strjoin("./", outfile);
 		/* printf("Outfile:%s\n", mini->outfile);	//borrar */
+		free(outfile);
 		return (i);
 	}
 	return (mini->outfile = NULL, 0);
 }
-
-// Gestionar más de una variable sin comillas
 
 int	is_cmd(t_mini *mini, char *str, int i, int j)
 {

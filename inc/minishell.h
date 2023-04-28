@@ -175,5 +175,6 @@ char	**cmd_split(t_mini *mini, char *str, char c);
 int		split_len(char **split);
 char	**cpy_split(char **split);
 void	sort_strings(char **split);
+void	free_son(t_mini *mini);
 
 #endif

@@ -35,27 +35,28 @@ char	*search_var(t_mini *mini, char *str, char *aux, int *i)
 	int		start;
 	char	*var;
 	char	*tmp;
+	char	*expand;
 
 	*i += 1;
 	start = *i;
 	if (str[*i] == '?')
 	{
 		*i += 1;
-		tmp = ft_strjoin(aux, ft_itoa(mini->p_exit));
-		free(aux);
-		return (tmp);
+		var = ft_itoa(mini->p_exit);
+		tmp = ft_strjoin(aux, var);
+		return (free(aux), free(var), tmp);
 	}
 	while (ft_isalnum(str[*i]) && str[*i] != '\0')
 		*i += 1;
 	var = ft_substr(str, start, *i - start);
-/* 	printf("var: %s\n", expand_var(var, mini->env)); */
-	if (expand_var_all(mini, var))
-		tmp = ft_strjoin(aux, expand_var_all(mini, var));
+	expand = expand_var_all(mini, var);
+	if (expand)
+		tmp = ft_strjoin(aux, expand);
 	else
 		tmp = ft_strdup(aux);
 	free(var);
 	free(aux);
-	return (tmp);
+	return (free(expand), tmp);
 }
 
 char	*in_double_quote(t_mini *mini, char *str, int i)
@@ -89,5 +90,5 @@ char	*in_double_quote(t_mini *mini, char *str, int i)
 	tmp = ft_strjoin(aux, &str[j]);
 	if (mini->dquote)
 		mini->error = -1;
-	return (tmp);
+	return (free(aux), tmp);
 }

@@ -28,8 +28,10 @@ int	built_env(t_mini *mini)
 	else if (get_argc(mini) > 1)
 	{
 		write(2, "env: to many arguments\n", 24);
+		free_son(mini);
 		exit(1);
 	}
+	free_son(mini);
 	exit(0);
 }
 
@@ -59,13 +61,17 @@ void	shell_level(t_mini *mini)
 	int		level;
 	char	*new;
 	char	*aux;
+	char	*expand;
 
-	level = ft_atoi(expand_var("SHLVL", mini->env));
+	expand = expand_var("SHLVL", mini->env);
+	level = ft_atoi(expand);
 	level++;
 	aux = ft_itoa(level);
 	new = ft_strjoin("SHLVL=", aux);
 	enter_var(mini, new);
 	free(aux);
+	free(new);
+	free(expand);
 }
 
 /* Imprime las variables de env y var. SOLO DEBUG */

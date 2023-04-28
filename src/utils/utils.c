@@ -101,3 +101,19 @@ char	**cmd_split(t_mini *mini, char *str, char c)
 	array[elem] = 0;
 	return (array);
 }
+
+void	free_son(t_mini *mini)
+{
+	free_split(mini->options);
+	free_split(mini->paths);
+	free_split(mini->cmd_pipe);
+	free_split(mini->env);
+	free_split(mini->var);
+	free(mini->input);
+	if (mini->infile)
+		free(mini->infile);
+	if (mini->outfile)
+		free(mini->outfile);
+	if (mini->limit)
+		free(mini->limit);
+}

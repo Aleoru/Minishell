@@ -28,7 +28,10 @@ static int	is_number(char *str)
 
 void	free_mini(t_mini *mini)
 {
-	(void)mini;
+	free_split(mini->env);
+	free_split(mini->var);
+	free_split(mini->paths);
+	free(mini->input);
 	rl_clear_history();
 }
 

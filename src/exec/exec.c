@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   exec.c                                             :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: aoropeza <aoropeza@student.42malaga.com>   +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2023/04/28 20:22:47 by aoropeza          #+#    #+#             */
+/*   Updated: 2023/04/28 20:22:49 by aoropeza         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "../../inc/minishell.h"
 
 void	get_env_paths(t_mini *mini)
@@ -25,6 +37,7 @@ void	get_env_paths(t_mini *mini)
 		mini->paths[i] = ft_strjoin(tmp, "/");
 		i++;
 	}
+	free(tmp);
 }
 
 void	exit_error(char *error)
