@@ -37,6 +37,7 @@ void	get_env_paths(t_mini *mini)
 		mini->paths[i] = ft_strjoin(tmp, "/");
 		i++;
 	}
+	mini->paths[i] = NULL;
 	free(tmp);
 }
 

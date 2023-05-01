@@ -47,8 +47,6 @@ int	built_unset(t_mini *mini)
 	return (0);
 }
 
-
-/* Borra un char *var_name de un char **src */
 char	**del_var(char **src, char *var_name, int len)
 {
 	char	**new;

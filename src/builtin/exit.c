@@ -26,26 +26,13 @@ static int	is_number(char *str)
 	return (1);
 }
 
-void	free_mini(t_mini *mini)
-{
-	free_split(mini->env);
-	free_split(mini->var);
-	free_split(mini->paths);
-	free(mini->input);
-	rl_clear_history();
-}
-
 int	built_exit(t_mini *mini)
 {
-	int	len;
 	int	ret;
 
-	len = 0;
-	while (mini->options[len])
-		len++;
-	if (len > 2)
+	if (get_argc(mini) > 2)
 		write(2, "exit: to many arguments", 23);
-	if (len == 2)
+	if (get_argc(mini) == 2)
 	{
 		if (is_number(mini->options[1]))
 		{
@@ -55,15 +42,48 @@ int	built_exit(t_mini *mini)
 		}
 		else
 		{
-			write(2, "exit: need numeric argument", 27);
+			write(2, "exit: need numeric argument\n", 27);
 			free_mini(mini);
 			exit(2);
 		}
 	}
-	if (len == 1)
+	if (get_argc(mini) == 1)
 	{
 		free_mini(mini);
 		exit(0);
 	}
 	return (1);
 }
+
+// int	built_exit(t_mini *mini)
+// {
+// 	int	len;
+// 	int	ret;
+
+// 	len = 0;
+// 	while (mini->options[len])
+// 		len++;
+// 	if (len > 2)
+// 		write(2, "exit: to many arguments", 23);
+// 	if (len == 2)
+// 	{
+// 		if (is_number(mini->options[1]))
+// 		{
+// 			ret = ft_atoi(mini->options[1]);
+// 			free_mini(mini);
+// 			exit(ret);
+// 		}
+// 		else
+// 		{
+// 			write(2, "exit: need numeric argument\n", 27);
+// 			free_mini(mini);
+// 			exit(2);
+// 		}
+// 	}
+// 	if (len == 1)
+// 	{
+// 		free_mini(mini);
+// 		exit(0);
+// 	}
+// 	return (1);
+// }

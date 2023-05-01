@@ -21,8 +21,10 @@ char	*ft_strjoin(char const *s1, char const *s2)
 
 	len_one = ft_strlen(s1);
 	len_two = ft_strlen(s2);
-	str = ft_calloc(1, (len_one + len_two + 1));
+	str = (char *)malloc((len_one + len_two + 1));
 	index = 0;
+	if (str == NULL)
+		return (NULL);
 	while (s1[index])
 	{
 		str[index] = s1[index];

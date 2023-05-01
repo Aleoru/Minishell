@@ -19,7 +19,6 @@ int	built_echo(t_mini *mini)
 
 	i = 1;
 	jump = 1;
-
 	while (mini->options[i] && ft_strncmp(mini->options[i], "-n", 2) == 0)
 	{
 		jump = 0;

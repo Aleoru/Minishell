@@ -17,40 +17,50 @@ void	ft_void(void)
 	system("leaks -q minishell");
 }
 
-int	main(int argc, char **argv, char **envp)
+static int	input(t_mini *mini)
 {
-	t_mini	mini;
-
-	atexit(ft_void);
-	set_signals();
-	if (argc > 0 && argv[0])
+	while (1)
 	{
-		ft_bzero(&mini, sizeof(t_mini));
-		mini.p_exit = 0;
-		mini.newline = 1;
-		init_env(&mini, envp);
-		while (1)
+		if (mini->newline == 1)
 		{
-			if (mini.newline == 1)
+			mini->input = readline("\033[33;1mMinishell> \033[0m");
+			if (mini->input == NULL)
 			{
-				mini.input = readline("\033[33;1mMiniHell> \033[0m");
-				if (mini.input == NULL)
-					return (free_mini(&mini), 0);
-				if (ft_strlen(mini.input) != 0)
-				{
-					add_history(mini.input);
-					get_env_paths(&mini);
-					interpreter(&mini);
-					free_split(mini.paths);
-				}
-				free(mini.input);
+				free_split(mini->env);
+				free_split(mini->var);
+				free(mini->input);
+				rl_clear_history();
+				return (0);
 			}
+			if (ft_strlen(mini->input) != 0 && is_blank(mini) == 1)
+			{
+				add_history(mini->input);
+				interpreter(mini);
+			}
+			free(mini->input);
 		}
 	}
 	return (0);
 }
 
-/* para compilar readline: -lreadline */
-/* readline: lee la linea */
-/* add_history: almacena la linea */
-/* getcwd: ruta absoluta actual */
+int	main(int argc, char **argv, char **envp)
+{
+	t_mini	mini;
+
+	atexit(ft_void);
+	if (argc == 1 && argv[0])
+	{
+		set_signals();
+		ft_bzero(&mini, sizeof(t_mini));
+		mini.p_exit = 0;
+		mini.newline = 1;
+		init_env(&mini, envp);
+		input(&mini);
+	}
+	else
+	{
+		write(2, "error: too many arguments\n", 26);
+		return (127);
+	}
+	return (0);
+}

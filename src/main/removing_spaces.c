@@ -16,10 +16,12 @@ void	replace_var(t_mini *mini, int i)
 {
 	char	*tmp;
 
+	mini->dquote = 1;
 	tmp = in_double_quote(mini, mini->input, i);
+	if (mini->dquote)
+		mini->error = -1;
 	free(mini->input);
 	mini->input = tmp;
- 	/* printf("input: %s\n", mini->input);		//borrar */
 }
 
 char	*not_del_spaces(t_mini *mini, char *str, int *i, int *j)

@@ -35,7 +35,6 @@ int	built_env(t_mini *mini)
 	exit(0);
 }
 
-/* Crea una copia de **envp para env y var */
 void	init_env(t_mini *mini, char **envp)
 {
 	mini->env_len = 0;
@@ -74,7 +73,6 @@ void	shell_level(t_mini *mini)
 	free(expand);
 }
 
-/* Imprime las variables de env y var. SOLO DEBUG */
 void	print_env(t_mini *mini)
 {
 	int		i;

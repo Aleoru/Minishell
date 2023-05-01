@@ -12,7 +12,6 @@
 
 #include "../../inc/minishell.h"
 
-/* Devuelve el nombre de la variable dentro de la string */
 char	*name_var(char *env_var)
 {
 	char	*name;
@@ -32,7 +31,6 @@ char	*name_var(char *env_var)
 	return (name);
 }
 
-/* Añada un nuevo *char a un **char */
 char	**add_str(char **src, char *str, int *len)
 {
 	char	**new;
@@ -53,7 +51,6 @@ char	**add_str(char **src, char *str, int *len)
 	return (new);
 }
 
-/* Comprueba que la variable existe en la posicion i del char **src */
 int	contain_var(char **src, char *env_var, int i)
 {
 	char	*name;
@@ -74,8 +71,6 @@ int	contain_var(char **src, char *env_var, int i)
 	return (1);
 }
 
-/* Busca en el char **src una variable con el mismo nombre que
-char *new_value y cambia el contenido */
 void	change_value(char **src, char *new_value)
 {
 	int		i;

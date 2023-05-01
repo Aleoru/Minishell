@@ -12,7 +12,6 @@
 
 #include "../../inc/minishell.h"
 
-/* Retorna el numero de argumenos en mini->options */
 int	get_argc(t_mini *mini)
 {
 	int	len;
@@ -23,7 +22,6 @@ int	get_argc(t_mini *mini)
 	return (len);
 }
 
-/* recive el nombre de una variable y devuelve su contenido */
 char	*expand_var(char *name_var, char **env)
 {
 	char	*var;
@@ -56,7 +54,6 @@ char	*expand_var_all(t_mini *mini, char *name_var)
 	return (var);
 }
 
-/* Añana de una variable a var */
 void	enter_var(t_mini *mini, char *enter_var)
 {
 	char	*name;

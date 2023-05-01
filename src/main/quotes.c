@@ -59,6 +59,16 @@ char	*search_var(t_mini *mini, char *str, char *aux, int *i)
 	return (free(expand), tmp);
 }
 
+int	final_quote(t_mini *mini, char *str, int j)
+{
+	if (str[j] == '\"')
+	{
+		mini->dquote = 0;
+		return (1);
+	}
+	return (0);
+}
+
 char	*in_double_quote(t_mini *mini, char *str, int i)
 {
 	int		j;
@@ -66,18 +76,14 @@ char	*in_double_quote(t_mini *mini, char *str, int i)
 	char	*aux;
 
 	j = -1;
-	mini->dquote = 1;
 	aux = ft_calloc(1, ft_strlen(str));
 	i++;
 	while (++j < i)
 		aux[j] = str[j];
 	while (mini->dquote && str[j])
 	{
-		if (str[j] == '\"')
-		{
-			mini->dquote = 0;
+		if (final_quote(mini, str, j))
 			break ;
-		}
 		if (str[j] == '$')
 		{
 			aux = search_var(mini, str, aux, &j);
@@ -88,7 +94,5 @@ char	*in_double_quote(t_mini *mini, char *str, int i)
 			aux[i++] = str[j++];
 	}
 	tmp = ft_strjoin(aux, &str[j]);
-	if (mini->dquote)
-		mini->error = -1;
 	return (free(aux), tmp);
 }

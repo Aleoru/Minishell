@@ -76,7 +76,14 @@ typedef struct s_mini
 void	get_env_paths(t_mini *mini);
 void	exec_cmd(t_mini mini, char *str);
 void	interpreter(t_mini *mini);
+
+/* pipex */
+void	seting_pipex(t_mini *mini);
 void	pipex(t_mini *mini);
+void	exe_pipex(t_mini *mini);
+void	exe_command(t_mini *mini, char *cmd);
+int		exe_alone_builtin(t_mini *mini);
+char	*get_cmd(char **paths, char *cmd);
 
 /*
 **	ENV
@@ -89,7 +96,7 @@ int		export(t_mini *mini, char *var_name);
 char	*expand_var(char *name_var, char **env);
 char	*expand_var_all(t_mini *mini, char *name_var);
 
-/* Añana de una variable a var */
+/* Añade una variable a var */
 void	enter_var(t_mini *mini, char *enter_var);
 
 /* Devuelve el nombre de la variable dentro de una cadena */
@@ -171,10 +178,11 @@ void	control_c(int sig);
 
 void	free_split(char **split);
 void	free_mini(t_mini *mini);
-char	**cmd_split(t_mini *mini, char *str, char c);
+void	free_son(t_mini *mini);
 int		split_len(char **split);
 char	**cpy_split(char **split);
+char	**cmd_split(t_mini *mini, char *str, char c);
 void	sort_strings(char **split);
-void	free_son(t_mini *mini);
+int		is_blank(t_mini *mini);
 
 #endif

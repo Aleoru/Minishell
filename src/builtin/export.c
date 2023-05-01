@@ -12,7 +12,7 @@
 
 #include "../../inc/minishell.h"
 
-static void print_var_value(char *str)
+static void	print_var_value(char *str)
 {
 	int		value;
 	int		i;
@@ -20,7 +20,7 @@ static void print_var_value(char *str)
 	i = 0;
 	value = 0;
 	write(1, "declare -x ", 12);
-	while(str[i])
+	while (str[i])
 	{
 		write(1, &str[i], 1);
 		if (str[i] == '=' && value == 0)
@@ -39,11 +39,11 @@ static void	print_all_env(char **env)
 {
 	int		i;
 	char	**tmp;
-	
+
 	i = 0;
 	tmp = cpy_split(env);
 	sort_strings(tmp);
-	while(tmp[i])
+	while (tmp[i])
 	{
 		print_var_value(tmp[i]);
 		i++;
@@ -51,10 +51,35 @@ static void	print_all_env(char **env)
 	free_split(tmp);
 }
 
+static void	add_local(t_mini *mini, int i)
+{
+	char	*name;
+	char	*expand;
+
+	if (ft_strchr(mini->options[i], '=') && ft_isalpha(mini->options[i][0]))
+	{
+		enter_var(mini, mini->options[i]);
+		name = name_var(mini->options[i]);
+		free(mini->options[i]);
+		mini->options[i] = name;
+	}
+	else if (ft_isalpha(mini->options[i][0]))
+	{
+		expand = expand_var(mini->options[i], mini->var);
+		if (expand == NULL)
+		{
+			name = ft_strjoin(mini->options[i], "=");
+			mini->var = add_str(mini->var, name, &mini->var_len);
+			free(name);
+		}
+		else
+			free(expand);
+	}
+}
+
 int	built_export(t_mini *mini)
 {
 	int		i;
-	char	*name;
 
 	i = 1;
 	if (get_argc(mini) == 1)
@@ -63,19 +88,7 @@ int	built_export(t_mini *mini)
 	{
 		while (mini->options[i])
 		{
-			if (ft_strchr(mini->options[i], '=') && ft_isalpha(mini->options[i][0]))
-			{
-				enter_var(mini, mini->options[i]);
-				name = name_var(mini->options[i]);
-				free(mini->options[i]);
-				mini->options[i] = name;
-			}
-			else if (ft_isalpha(mini->options[i][0]))
-			{
-				name = ft_strjoin(mini->options[i], "=");
-				mini->var = add_str(mini->var, name, &mini->var_len);
-				free(name);
-			}
+			add_local(mini, i);
 			export(mini, mini->options[i]);
 			i++;
 		}
@@ -83,7 +96,6 @@ int	built_export(t_mini *mini)
 	return (0);
 }
 
-/* Añade en env una variable que exista en var */
 int	export(t_mini *mini, char *var_name)
 {
 	char	*expvar;
@@ -110,3 +122,36 @@ int	export(t_mini *mini, char *var_name)
 	free(expenv);
 	return (1);
 }
+
+//int	built_export(t_mini *mini)
+// {
+// 	int		i;
+// 	char	*name;
+
+// 	i = 1;
+// 	if (get_argc(mini) == 1)
+// 		print_all_env(mini->env);
+// 	else if (get_argc(mini) >= 2)
+// 	{
+// 		while (mini->options[i])
+// 		{
+// 			if (ft_strchr(mini->options[i], '=')
+//				&& ft_isalpha(mini->options[i][0]))
+// 			{
+// 				enter_var(mini, mini->options[i]);
+// 				name = name_var(mini->options[i]);
+// 				free(mini->options[i]);
+// 				mini->options[i] = name;
+// 			}
+// 			else if (ft_isalpha(mini->options[i][0]))
+// 			{
+// 				name = ft_strjoin(mini->options[i], "=");
+// 				mini->var = add_str(mini->var, name, &mini->var_len);
+// 				free(name);
+// 			}
+// 			export(mini, mini->options[i]);
+// 			i++;
+// 		}
+// 	}
+// 	return (0);
+// }

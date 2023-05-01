@@ -77,11 +77,7 @@ char	**cmd_split(t_mini *mini, char *str, char c)
 	size_t	str_pos;
 	size_t	start;
 
-	if (str == NULL)
-		return (NULL);
 	array = malloc((count_word(mini, str, c) + 1) * sizeof(char *));
-	if (!array)
-		return (NULL);
 	str_pos = 0;
 	elem = 0;
 	while (str[str_pos] && elem < count_word(mini, str, c))
@@ -102,18 +98,17 @@ char	**cmd_split(t_mini *mini, char *str, char c)
 	return (array);
 }
 
-void	free_son(t_mini *mini)
+int	is_blank(t_mini *mini)
 {
-	free_split(mini->options);
-	free_split(mini->paths);
-	free_split(mini->cmd_pipe);
-	free_split(mini->env);
-	free_split(mini->var);
-	free(mini->input);
-	if (mini->infile)
-		free(mini->infile);
-	if (mini->outfile)
-		free(mini->outfile);
-	if (mini->limit)
-		free(mini->limit);
+	int	i;
+
+	i = 0;
+	while (mini->input[i])
+	{
+		if (mini->input[i] != ' ' && mini->input[i] != '\t'
+			&& mini->input[i] != '\0')
+			return (1);
+		i++;
+	}
+	return (0);
 }

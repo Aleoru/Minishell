@@ -127,5 +127,4 @@ void	can_declare_var(t_mini *mini, char *str)
 	}
 	var_syntax(mini, str);
 	mini->declare = 1;
-	free(str);
 }
