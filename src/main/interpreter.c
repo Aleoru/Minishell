@@ -77,6 +77,7 @@ int	split_cmd_line(t_mini *mini)
 	int		j;
 	char	*str;
 
+	replace_var(mini);
 	str = del_sep_space(mini);
 	if (mini->error == -1)
 		return (free(str), -1);

@@ -30,7 +30,7 @@ int	in_quote(t_mini *mini, char *str, int i)
 	return (i);
 }
 
-char	*search_var(t_mini *mini, char *str, char *aux, int *i)
+/* char	*search_var(t_mini *mini, char *str, char *aux, int *i)
 {
 	int		start;
 	char	*var;
@@ -95,4 +95,4 @@ char	*in_double_quote(t_mini *mini, char *str, int i)
 	}
 	tmp = ft_strjoin(aux, &str[j]);
 	return (free(aux), tmp);
-}
+} */

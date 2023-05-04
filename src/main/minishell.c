@@ -45,9 +45,9 @@ static int	input(t_mini *mini)
 
 int	main(int argc, char **argv, char **envp)
 {
+	//atexit(ft_void);
 	t_mini	mini;
 
-	atexit(ft_void);
 	if (argc == 1 && argv[0])
 	{
 		set_signals();

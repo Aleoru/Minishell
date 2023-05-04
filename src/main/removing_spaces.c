@@ -12,16 +12,32 @@
 
 #include "../../inc/minishell.h"
 
-void	replace_var(t_mini *mini, int i)
+void	replace_var(t_mini *mini)
 {
-	char	*tmp;
+	int		i;
+	int		j;
+	char	*str;
 
-	mini->dquote = 1;
-	tmp = in_double_quote(mini, mini->input, i);
-	if (mini->dquote)
-		mini->error = -1;
+	i = 0;
+	j = 0;
+	str = ft_calloc(1, ft_strlen(mini->input) * sizeof(char));
+	while (mini->input[i])
+	{
+		if (mini->input[i] == '\'' && mini->quote == 0)
+			mini->quote = 1;
+		else if (mini->input[i] == '\'' && mini->quote == 1)
+			mini->quote = 0;
+		if (mini->quote == 0 && mini->input[i] == '$')
+		{
+			str = has_var(mini, str, &i);
+			while (str[j])
+				j++;
+		}
+		str[j++] = mini->input[i++];
+	}
+	str[j] = '\0';
 	free(mini->input);
-	mini->input = tmp;
+	mini->input = str;
 }
 
 char	*not_del_spaces(t_mini *mini, char *str, int *i, int *j)
