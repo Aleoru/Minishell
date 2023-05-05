@@ -12,13 +12,23 @@
 
 #include "../../inc/minishell.h"
 
+static int	valid_builtin(char *option, char *word)
+{
+	unsigned int	len;
+
+	len = ft_strlen(word);
+	if (!ft_strncmp(option, word, len) && ft_strlen(option) == len)
+		return (1);
+	return (0);
+}
+
 static int	exe_builtin(t_mini *mini)
 {
-	if (!ft_strncmp(mini->options[0], "env", ft_strlen(mini->options[0])))
+	if (valid_builtin(mini->options[0], "env"))
 		built_env(mini);
-	if (!ft_strncmp(mini->options[0], "pwd", ft_strlen(mini->options[0])))
+	if (valid_builtin(mini->options[0], "pwd"))
 		built_pwd(mini);
-	if (!ft_strncmp(mini->options[0], "echo", ft_strlen(mini->options[0])))
+	if (valid_builtin(mini->options[0], "echo"))
 		built_echo(mini);
 	return (1);
 }
@@ -63,27 +73,22 @@ void	exe_command(t_mini *mini, char *cmd)
 
 int	exe_alone_builtin(t_mini *mini)
 {
+	char	*str;
+
+	str = NULL;
 	if (mini->cmd_pipe[0])
 	{
-		mini->options = cmd_split(mini, mini->cmd_pipe[0], ' ');
-		if (!ft_strncmp(mini->options[0], "exit", ft_strlen(mini->options[0])))
+		str = ft_strdup(mini->cmd_pipe[0]);
+		mini->options = cmd_split(mini, str, ' ');
+		free(str);
+		if (valid_builtin(mini->options[0], "exit"))
 			built_exit(mini);
-		if (!ft_strncmp(mini->options[0], "cd", ft_strlen(mini->options[0])))
-		{
-			built_cd(mini);
-			return (free_split(mini->options), 1);
-		}
-		if (!ft_strncmp(mini->options[0], "unset", ft_strlen(mini->options[0])))
-		{
-			built_unset(mini);
-			return (free_split(mini->options), 1);
-		}
-		if (!ft_strncmp(mini->options[0], "export",
-				ft_strlen(mini->options[0])))
-		{
-			built_export(mini);
-			return (free_split(mini->options), 1);
-		}
+		if (valid_builtin(mini->options[0], "cd"))
+			return (built_cd(mini), free_split(mini->options), 1);
+		if (valid_builtin(mini->options[0], "unset"))
+			return (built_unset(mini), free_split(mini->options), 1);
+		if (valid_builtin(mini->options[0], "export"))
+			return (built_export(mini), free_split(mini->options), 1);
 		free_split(mini->options);
 	}
 	return (0);

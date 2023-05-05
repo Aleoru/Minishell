@@ -12,10 +12,10 @@
 
 #include "../../inc/minishell.h"
 
-void	ft_void(void)
+/* void	ft_void(void)
 {
 	system("leaks -q minishell");
-}
+} */
 
 static int	input(t_mini *mini)
 {
@@ -47,7 +47,6 @@ int	main(int argc, char **argv, char **envp)
 {
 	t_mini	mini;
 
-	atexit(ft_void);
 	if (argc == 1 && argv[0])
 	{
 		set_signals();

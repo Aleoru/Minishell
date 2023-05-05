@@ -119,39 +119,8 @@ int	export(t_mini *mini, char *var_name)
 		free(enter_var);
 		return (0);
 	}
+	if (expenv)
+		free(expvar);
 	free(expenv);
 	return (1);
 }
-
-//int	built_export(t_mini *mini)
-// {
-// 	int		i;
-// 	char	*name;
-
-// 	i = 1;
-// 	if (get_argc(mini) == 1)
-// 		print_all_env(mini->env);
-// 	else if (get_argc(mini) >= 2)
-// 	{
-// 		while (mini->options[i])
-// 		{
-// 			if (ft_strchr(mini->options[i], '=')
-//				&& ft_isalpha(mini->options[i][0]))
-// 			{
-// 				enter_var(mini, mini->options[i]);
-// 				name = name_var(mini->options[i]);
-// 				free(mini->options[i]);
-// 				mini->options[i] = name;
-// 			}
-// 			else if (ft_isalpha(mini->options[i][0]))
-// 			{
-// 				name = ft_strjoin(mini->options[i], "=");
-// 				mini->var = add_str(mini->var, name, &mini->var_len);
-// 				free(name);
-// 			}
-// 			export(mini, mini->options[i]);
-// 			i++;
-// 		}
-// 	}
-// 	return (0);
-// }

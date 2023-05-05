@@ -28,7 +28,8 @@ char	*has_var(t_mini *mini, char *str, int *i)
 		tmp = ft_strjoin(str, var);
 		return (free(str), free(var), tmp);
 	}
-	while (ft_isalnum(mini->input[*i]) && mini->input[*i] != '\0')
+	while (mini->input[*i] != '$' && ft_isalnum(mini->input[*i])
+		&& mini->input[*i] != '\0')
 		*i += 1;
 	var = ft_substr(mini->input, start, *i - start);
 	expand = expand_var_all(mini, var);
@@ -42,11 +43,7 @@ char	*has_var(t_mini *mini, char *str, int *i)
 char	*is_var_or_quote(t_mini *mini, char *str, int *i, int *j)
 {
 	if (mini->input[*i] == '\'' || mini->input[*i] == '\"')
-	{
-		if (mini->input[*i] == '\"')
-			replace_var(mini, *i);
 		str = not_del_spaces(mini, str, i, j);
-	}
 	if (mini->input[*i] == '$')
 	{
 		str = has_var(mini, str, i);

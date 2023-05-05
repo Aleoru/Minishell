@@ -29,6 +29,8 @@ void	init_mini(t_mini *mini)
 	mini->error = 0;
 	while (mini->input[i])
 	{
+		if (mini->input[i] == '\'' || mini->input[i] == '\"')
+			i = in_quote(mini, mini->input, i);
 		if (mini->input[i] == '|')
 			mini->n_cmd++;
 		if (mini->input[i] == '>' && mini->input[i + 1] != '>')
@@ -37,7 +39,6 @@ void	init_mini(t_mini *mini)
 			mini->append++;
 		i++;
 	}
-	mini->n_cmd++;
 }
 
 int	syntax_validation(t_mini *mini)
@@ -92,7 +93,7 @@ int	split_cmd_line(t_mini *mini)
 		j = parsing(mini, str, &i, j);
 		if (i == -1)
 			return (free(str), -1);
-		if (str[i] == '\0')
+		if (str[i] == '\0' || j >= mini->n_cmd)
 			break ;
 	}
 	if (mini->declare == 0)
@@ -103,6 +104,7 @@ int	split_cmd_line(t_mini *mini)
 void	interpreter(t_mini *mini)
 {
 	init_mini(mini);
+	mini->n_cmd++;
 	if (syntax_validation(mini) == -1)
 	{
 		write(2, ERROR_SYN, ft_strlen(ERROR_SYN));

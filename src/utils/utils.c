@@ -37,9 +37,9 @@ static size_t	count_word(t_mini *mini, char *str, char c)
 		index++;
 	while (str[index])
 	{
-		if (str[index] == '\'' && !mini->quote)
+		if ((str[index] == '\'' || str[index] == '\"') && !mini->quote)
 			mini->quote = 1;
-		if (str[index] == '\'' && mini->quote)
+		if ((str[index] == '\'' || str[index] == '\"') && mini->quote)
 			mini->quote = 0;
 		if (!mini->quote && str[index] == c && str[index + 1] != c
 			&& str[index + 1] != '\0')
@@ -58,7 +58,7 @@ char	*replace_by_spaces(t_mini *mini, char *str, size_t *i, size_t *start)
 	str[*i] = ' ';
 	*i += 1;
 	*start = *i;
-	while (mini->quote || mini->dquote)
+	while ((mini->quote || mini->dquote) && mini->input[*i] != '\0')
 	{
 		if (mini->input[*i] == '\'')
 			mini->quote = 0;
@@ -94,7 +94,7 @@ char	**cmd_split(t_mini *mini, char *str, char c)
 		if (!array[elem - 1])
 			return (split_free(array));
 	}
-	array[elem] = 0;
+	array[elem] = NULL;
 	return (array);
 }
 

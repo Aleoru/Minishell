@@ -132,16 +132,17 @@ void	print_env(t_mini *mini);
 */
 
 int		in_quote(t_mini *mini, char *str, int i);
-char	*in_double_quote(t_mini *mini, char *str, int i);
+//char	*in_double_quote(t_mini *mini, char *str, int i);
 int		has_heredoc(t_mini *mini, char *str, int i);
 int		has_infile(t_mini *mini, char *str);
 int		has_outfile(t_mini *mini, char *str, int i);
 int		is_cmd(t_mini *mini, char *str, int i, int j);
 char	*del_sep_space(t_mini *mini);
 char	*is_var_or_quote(t_mini *mini, char *str, int *i, int *j);
-void	replace_var(t_mini *mini, int i);
+void	replace_var(t_mini *mini);
 char	*not_del_spaces(t_mini *mini, char *str, int *i, int *j);
 void	can_declare_var(t_mini *mini, char *str);
+char	*has_var(t_mini *mini, char *str, int *i);
 
 /*
 *	BUILT-INS

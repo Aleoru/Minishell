@@ -92,6 +92,8 @@ void	pipex(t_mini *mini)
 	}
 	if (mini->infile != NULL)
 	{
+		if (mini->heredoc)
+			unlink(".infile.tmp");
 		close(mini->in_fd);
 		free(mini->infile);
 	}

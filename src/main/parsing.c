@@ -21,7 +21,7 @@ int	has_heredoc(t_mini *mini, char *str, int i)
 		i += 1;
 	i++;
 	start = i;
-	while (str[i] != ' ' && str[i] != '\0')
+	while (!ft_strchr("<|> ", str[i]) && str[i] != '\0')
 		i++;
 	mini->limit = ft_substr(str, start, i - start);
 	mini->heredoc = 1;
@@ -41,7 +41,7 @@ int	has_infile(t_mini *mini, char *str)
 			i += 1;
 		i++;
 		start = i;
-		while (str[i] != ' ')
+		while (!ft_strchr("<|> ", str[i]) && str[i] != '\0')
 			i++;
 		mini->infile = ft_substr(str, start, i - start);
 		return (i + 1);
@@ -69,8 +69,7 @@ int	has_outfile(t_mini *mini, char *str, int i)
 			i += 1;
 		i++;
 		start = i;
-		while (str[i] != ' ' && str[i] != '|'
-			&& str[i] != '>' && str[i] != '\0')
+		while (!ft_strchr("<|> ", str[i]) && str[i] != '\0')
 			i++;
 		outfile = ft_substr(str, start, i - start);
 		mini->outfile = ft_strjoin("./", outfile);
@@ -92,10 +91,8 @@ int	is_cmd(t_mini *mini, char *str, int i, int j)
 	while (str[i] != '|' && str[i] != '>' && str[i] != '$'
 		&& str[i] != '\0')
 	{
-		if (str[i] == '\'')
+		if (str[i] == '\'' || str[i] == '\"')
 			i = in_quote(mini, str, i);
-		else if (str[i] == '\"')
-			mini->dquote = 1;
 		if (i == -1)
 			return (-1);
 		i++;

@@ -19,7 +19,7 @@ static void	set_env_pwd(t_mini *mini, char *var_name)
 	char	*buff;
 
 	buff = malloc(sizeof(char) * 1000);
-	getcwd(buff, sizeof(buff));
+	getcwd(buff, 1000);
 	pwd = ft_strjoin(var_name, buff);
 	enter_var(mini, pwd);
 	name = name_var(pwd);
